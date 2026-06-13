@@ -1,0 +1,22 @@
+#+TITLE: Spacemacs Configuration
+#+AUTHOR: err
+#+DATE: 2026-06-12
+
+This directory contains the personal [[https://www.spacemacs.org/][Spacemacs]] configuration.
+
+* Files
+
+- =init.el= :: Main Spacemacs configuration file (formerly =~/.spacemacs=).
+- =.spacemacs.env= :: Environment variables loaded at startup.
+- =layers/= :: Custom Spacemacs layers.
+- =gptel-tools.el= :: Additional Elisp utilities for =gptel=.
+
+* Layout
+
+Spacemacs loads =init.el= from this directory when =~/.spacemacs.d/init.el= exists.
+Custom layers are resolved through the path set in
+=dotspacemacs-configuration-layer-path=:
+
+#+begin_example elisp
+dotspacemacs-configuration-layer-path '("~/.spacemacs.d/layers/")
+#+end_example

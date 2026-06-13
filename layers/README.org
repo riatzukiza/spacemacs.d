@@ -1,0 +1,30 @@
+#+TITLE: Custom Spacemacs Layers
+#+AUTHOR: err
+#+DATE: 2026-06-12
+
+This directory holds custom Spacemacs layers used by the configuration in
+~/.spacemacs.d/init.el=.
+
+* Layer index
+
+| Layer             | Description                                          |
+|-------------------+------------------------------------------------------|
+| =also-prom=       | Additional Promethean utilities and helpers.         |
+| =codex=           | Codex integration helpers.                           |
+| =codex-hub=       | Codex-hub layer configuration.                       |
+| =direnv=          | direnv support for Emacs.                            |
+| =err-commonlisp=  | Common Lisp customizations.                          |
+| =err-core=        | Core err-specific settings and functions.            |
+| =err-ts=          | TypeScript/tree-sitter related settings.             |
+| =llm=             | Large language model client configuration.           |
+| =obsidian=        | Obsidian note integration.                           |
+| =opencode-agent-shell= | OpenCode agent shell support.                   |
+| =promethean=      | Promethean project helpers and custom modes.         |
+| =promethean-vterm= | vterm integration for Promethean workflows.         |
+| =prom-unique=     | Unique file creation and capture workflows.          |
+| =semantic-search= | Semantic search tooling.                             |
+
+* Adding a new layer
+
+Create a subdirectory with at least a =packages.el= file.  See the
+[[https://develop.spacemacs.org/doc/LAYERS.html][Spacemacs layer documentation]] for the full structure.
