@@ -1,0 +1,25 @@
+# .github/workflows/ci.yml
+name: ERT Tests
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  test:
+    name: Run ERT suite
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install Emacs
+        uses: purcell/setup-emacs@master
+        with:
+          version: "29.4"
+
+      - name: Run ERT tests
+        run: make test

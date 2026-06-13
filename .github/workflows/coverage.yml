@@ -1,0 +1,30 @@
+# .github/workflows/coverage.yml
+name: Coverage Report
+
+on:
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  coverage:
+    name: Generate coverage report
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Install Emacs
+        uses: purcell/setup-emacs@master
+        with:
+          version: "29.4"
+
+      - name: Generate coverage
+        run: make coverage
+
+      - name: Upload lcov report
+        uses: actions/upload-artifact@v4
+        with:
+          name: lcov-coverage-report
+          path: coverage/lcov.info
+          if-no-files-found: error

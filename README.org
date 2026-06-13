@@ -20,3 +20,35 @@ Custom layers are resolved through the path set in
 #+begin_example elisp
 dotspacemacs-configuration-layer-path '("~/.spacemacs.d/layers/")
 #+end_example
+
+* Testing
+
+Run the full ERT suite locally:
+
+#+begin_src sh
+make test
+#+end_src
+
+Generate a coverage report (requires Emacs with MELPA access):
+
+#+begin_src sh
+make coverage
+# report written to coverage/lcov.info
+#+end_src
+
+CI runs on every push and pull request via GitHub Actions. PRs are blocked
+from merging if any test fails. Coverage artifacts are uploaded per PR.
+
+** Adding tests
+
+- Unit tests live in =tests/unit/=. Each file targets one layer's =funcs.el=.
+- Integration tests live in =tests/integration/=. Each file targets one layer's
+  declared package list and init function contracts.
+- Smoke tests live in =tests/smoke/=. These assert startup-level invariants.
+
+Name every =ert-deftest= with the =μ/= prefix and make the name read as a claim:
+
+#+begin_src elisp
+(ert-deftest μ/my-func-does-the-right-thing ()
+  ...)
+#+end_src
