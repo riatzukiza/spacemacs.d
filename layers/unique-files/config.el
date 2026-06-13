@@ -29,7 +29,8 @@ Relative paths are resolved against the current project root."
     (js-ts-mode        :dir "docs/dev"   :ext ".js")
     (typescript-mode   :dir "docs/dev"   :ext ".ts")
     (typescript-ts-mode :dir "docs/dev"  :ext ".ts"))
-  "Alist mapping major modes to plists with :dir and :ext keys."
+  "Alist mapping major modes to plists with :dir and :ext keys.
+Note that only modes listed here can be selected via `unique-files/open-for-mode'."
   :type '(alist :key-type symbol
                 :value-type (plist :key-type symbol :value-type string))
   :group 'unique-files)
@@ -50,9 +51,35 @@ When `orgalist' is unavailable, fall back to `unique-files-list-continue-mode'."
   :type 'boolean
   :group 'unique-files)
 
-;; Mark variables safe for .dir-locals.el
-(dolist (v '(unique-files-mode-targets unique-files-mode-headers))
-  (put v 'safe-local-variable #'listp))
+(require 'cl-lib)
+
+;; Mark variables safe for .dir-locals.el with conservative predicates.
+(defun unique-files--safe-targets-p (value)
+  "Return non-nil if VALUE is a valid `unique-files-mode-targets' shape."
+  (and (listp value)
+       (cl-every (lambda (entry)
+                   (and (consp entry)
+                        (symbolp (car entry))
+                        (plistp (cdr entry))
+                        (let ((dir (plist-get (cdr entry) :dir))
+                              (ext (plist-get (cdr entry) :ext)))
+                          (and (stringp dir)
+                               (stringp ext)
+                               (not (file-name-absolute-p dir))))))
+                 value)))
+
+(defun unique-files--safe-headers-p (value)
+  "Return non-nil if VALUE is a valid `unique-files-mode-headers' shape."
+  (and (listp value)
+       (cl-every (lambda (entry)
+                   (and (consp entry)
+                        (symbolp (car entry))
+                        (or (functionp (cdr entry))
+                            (and (symbolp (cdr entry)) (fboundp (cdr entry))))))
+                 value)))
+
+(put 'unique-files-mode-targets 'safe-local-variable #'unique-files--safe-targets-p)
+(put 'unique-files-mode-headers 'safe-local-variable #'unique-files--safe-headers-p)
 
 (dolist (v '(unique-files-doc-format unique-files-default-dir))
   (put v 'safe-local-variable #'stringp))
@@ -63,9 +90,10 @@ When `orgalist' is unavailable, fall back to `unique-files-list-continue-mode'."
   (if orgalist-ok
       (progn
         (dolist (h hooks) (add-hook h #'orgalist-mode))
-        (with-eval-after-load 'orgalist
-          (define-key orgalist-mode-map (kbd "RET")   #'unique-files/orgalist-ret-dwim)
-          (define-key orgalist-mode-map (kbd "M-RET") #'orgalist-insert-item)))
+        (add-hook 'orgalist-mode-hook
+                  (lambda ()
+                    (local-set-key (kbd "RET") #'unique-files/orgalist-ret-dwim)
+                    (local-set-key (kbd "M-RET") #'orgalist-insert-item))))
     (dolist (h hooks) (add-hook h #'unique-files-list-continue-mode))))
 
 ;;; config.el ends here

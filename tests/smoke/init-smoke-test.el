@@ -19,7 +19,11 @@
       (insert-file-contents path)
       (should
        (condition-case _
-           (progn (read (current-buffer)) t)
+           (progn
+             (while (condition-case nil
+                        (progn (read (current-buffer)) t)
+                      (end-of-file nil)))
+             t)
          (error nil))))))
 
 (ert-deftest μ/smoke-dotspacemacs-functions-defined ()

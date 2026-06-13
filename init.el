@@ -29,7 +29,8 @@ configuration."
 This function is called at the very end of Spacemacs startup, after layer
 configuration."
   (load (expand-file-name "config/lsp.el" dotspacemacs-directory))
-  (load (expand-file-name "config/frame-title.el" dotspacemacs-directory)))
+  (load (expand-file-name "config/frame-title.el" dotspacemacs-directory))
+  (load (expand-file-name "config/helm-popup.el" dotspacemacs-directory)))
 
 
 ;; Do not write anything past this comment. This is where Emacs will
@@ -97,17 +98,16 @@ This function is called at the very end of Spacemacs initialization."
          with-editor writeroom-mode ws-butler yaml yaml-mode yasnippet
          yasnippet-snippets))
    '(package-vc-selected-packages
-     '((agent-shell :url "https://github.com/xenodium/agent-shell")))
+     '())
    '(safe-local-variable-values
-     '((prom/unique-mode-targets (markdown-mode :dir "docs/inbox" :ext ".md")
-                                 (org-mode :dir "docs/inbox" :ext ".org")
-                                 (text-mode :dir "docs/text" :ext ".txt")
-                                 (js-mode :dir "pseudo/inbox" :ext ".js")
-                                 (typescript-ts-mode :dir "pseudo/inbox" :ext
-                                                     ".ts"))
-       (prom/unique-default-dir . "docs/unique")
-       (prom/unique-doc-format . "%Y.%m.%d.%H.%M.%S")
-       (eval promethean-lsp-append-gitignore-to-ignored-dirs)
+     '((unique-files-mode-targets (markdown-mode :dir "docs/inbox" :ext ".md")
+                                  (org-mode :dir "docs/inbox" :ext ".org")
+                                  (text-mode :dir "docs/text" :ext ".txt")
+                                  (js-mode :dir "pseudo/inbox" :ext ".js")
+                                  (typescript-ts-mode :dir "pseudo/inbox" :ext
+                                                      ".ts"))
+       (unique-files-default-dir . "docs/unique")
+       (unique-files-doc-format . "%Y.%m.%d.%H.%M.%S")
        (typescript-backend . tide) (typescript-backend . lsp)
        (javascript-backend . tide) (javascript-backend . tern)
        (javascript-backend . lsp))))

@@ -23,7 +23,9 @@
     (if (file-name-absolute-p path) path (expand-file-name path root))))
 
 (defun unique-files//normalize-mode (mode)
-  "Normalize MODE aliases to canonical names used by `unique-files-mode-targets'."
+  "Normalize MODE aliases to canonical names used by `unique-files-mode-headers'.
+`unique-files-mode-targets' is looked up with the original MODE first; only
+headers are normalized."
   (pcase mode
     ('gfm-mode 'markdown-mode)
     ('js-ts-mode 'js-mode)
@@ -31,9 +33,16 @@
     (_ mode)))
 
 (defun unique-files//target (mode)
-  "Return plist (:dir :ext) for MODE, expanding :dir relative to project root."
-  (let* ((mode (unique-files//normalize-mode mode))
-         (pl   (alist-get mode unique-files-mode-targets)))
+  "Return plist (:dir :ext) for MODE, expanding :dir relative to project root.
+Looks up MODE directly in `unique-files-mode-targets' first; if not found,
+falls back to a normalized alias."
+  (let* ((pl (or (alist-get mode unique-files-mode-targets)
+                 (alist-get (pcase mode
+                              ('gfm-mode 'markdown-mode)
+                              ('js-ts-mode 'js-mode)
+                              ('typescript-ts-mode 'typescript-mode)
+                              (_ mode))
+                            unique-files-mode-targets))))
     (list :dir (unique-files//expand (or (plist-get pl :dir) unique-files-default-dir))
           :ext (or (plist-get pl :ext) ".txt"))))
 
@@ -61,9 +70,10 @@
   "Insert an Org header for NAME."
   (insert "#+TITLE: " name "\n\n"))
 
-(defun unique-files//insert-header-js (name)
-  "Insert a JS block comment header for NAME."
-  (insert "/* " name " */\n\n"))
+(defun unique-files//insert-header (mode name)
+  "Insert a header for NAME if MODE maps to a header function."
+  (when-let ((hdr (alist-get (unique-files//normalize-mode mode) unique-files-mode-headers)))
+    (funcall hdr name)))
 
 (defun unique-files/open-for-mode (mode &optional ask-header ext)
   "Create and visit a timestamped file for MODE.
@@ -85,8 +95,7 @@ EXT overrides the default extension for MODE (e.g., \".md\")."
           (funcall mode)
         (message "Mode %s is not available; staying in %s" mode major-mode)))
     (when ask-header
-      (when-let ((hdr (alist-get (unique-files//normalize-mode mode) unique-files-mode-headers)))
-        (funcall hdr (file-name-base path))))
+      (unique-files//insert-header mode (file-name-base path)))
     (save-buffer)
     (message "New %s: %s" mode path)
     path))
@@ -186,8 +195,8 @@ Keys are :indent, :raw, :next, and :checkbox."
   (let ((term (aref raw (1- (length raw)))))
     (cond
      ((string-match-p "^[0-9]+" raw) (format "1%c" term))
-     ((string-match-p "^[A-Z]" raw)  (format "A%c" term))
-     ((string-match-p "^[a-z]" raw)  (format "a%c" term))
+     ((string-match-p "^[A-Z]" raw)  (if (string= raw "Z") "Z" (format "A%c" term)))
+     ((string-match-p "^[a-z]" raw)  (if (string= raw "z") "z" (format "a%c" term)))
      (t raw))))
 
 (defun unique-files-list--second-marker-like (raw)
@@ -195,8 +204,8 @@ Keys are :indent, :raw, :next, and :checkbox."
   (let ((term (aref raw (1- (length raw)))))
     (cond
      ((string-match-p "^[0-9]+" raw) (format "2%c" term))
-     ((string-match-p "^[A-Z]" raw)  (format "B%c" term))
-     ((string-match-p "^[a-z]" raw)  (format "b%c" term))
+     ((string-match-p "^[A-Z]" raw)  (if (string= raw "A") "B" (format "B%c" term)))
+     ((string-match-p "^[a-z]" raw)  (if (string= raw "a") "b" (format "b%c" term)))
      (t raw))))
 
 (defun unique-files-list-ret-dwim ()

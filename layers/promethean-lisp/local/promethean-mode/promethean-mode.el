@@ -45,6 +45,8 @@
       (? "-")
       (+ digit)
       (? "." (+ digit))
+      (not (any digit))
+      (*? any)
       symbol-end)
   "Regex for integers/decimals with optional leading '-'.")
 

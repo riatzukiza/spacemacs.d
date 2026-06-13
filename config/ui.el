@@ -157,8 +157,8 @@
 
  dotspacemacs-undo-system 'undo-fu
 
- dotspacemacs-frame-title-format "%I@%S"
-
+ ;; Frame/icon title is overridden dynamically in config/frame-title.el.
+ dotspacemacs-frame-title-format nil
  dotspacemacs-icon-title-format nil
 
  dotspacemacs-show-trailing-whitespace t

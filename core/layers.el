@@ -13,7 +13,7 @@
 
  dotspacemacs-ask-for-lazy-installation t
 
- dotspacemacs-configuration-layer-path '("~/.spacemacs.d/layers/")
+ dotspacemacs-configuration-layer-path (list (expand-file-name "layers/" dotspacemacs-directory))
 
  dotspacemacs-configuration-layers
  '(
@@ -39,13 +39,12 @@
                typescript-fmt-on-save t
                typescript-fmt-tool 'prettier
                node-add-modules-path t)
-   (javascript :variables
-               javascript-fmt-tool 'prettier
-               node-add-modules-path t)
-   opencode-agent-shell
-   html
-   toml
-   yaml
+    (javascript :variables
+                javascript-fmt-tool 'prettier
+                node-add-modules-path t)
+    html
+    toml
+    yaml
 
    ;; Spacemacs essentials
    auto-completion
@@ -59,11 +58,10 @@
    org
    github-copilot
 
-   ;; Private layers
-   unique-files
-   err-helm-popup
+    ;; Private layers
+    unique-files
 
-   (shell :variables
+    (shell :variables
           shell-default-height 30
           shell-default-position 'bottom
           shell-default-shell 'vterm)
@@ -75,15 +73,14 @@
 
    treemacs
 
-   llm
-   codex
+    llm
+    codex
 
-   promethean
-   promethean-lisp
-   err-core
-   err-ts
-   err-commonlisp
-   )
+    promethean-lisp
+    err-core
+    err-ts
+    err-commonlisp
+    )
 
  dotspacemacs-additional-packages '(yasnippet-snippets prettier-js lsp-sonarlint obsidian)
  dotspacemacs-frozen-packages '()

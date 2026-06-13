@@ -1,4 +1,8 @@
 ;;; funcs.el --- err-core layer funcs -*- lexical-binding: t; -*-
+;;; Commentary:
+;; Core err helpers.
+
+;;; Code:
 
 (require 'cl-lib)
 (require 'subr-x)
@@ -11,21 +15,25 @@
       (set-frame-parameter frame 'alpha (cons err-core/frame-opacity err-core/frame-opacity)))))
 
 (defun err-core/copilot-lisp-indent-fallback ()
+  "Return the best available Lisp indent value, defaulting to 2."
   (or (and (boundp 'lisp-body-indent) (numberp lisp-body-indent) lisp-body-indent)
       (and (boundp 'lisp-indent-offset) (numberp lisp-indent-offset) lisp-indent-offset)
       (and (boundp 'standard-indent) (numberp standard-indent) standard-indent)
       (and (boundp 'tab-width) (numberp tab-width) tab-width)
       2))
+
 ;;;###autoload
 (defun err-core/next-conflicted-file ()
   "Visit the next conflicted file in the repo (no smerge state needed)."
   (interactive)
-  (let* ((default-directory (or (ignore-errors (magit-toplevel)) default-directory))
+  (let* ((default-directory (or (and (fboundp 'magit-toplevel)
+                                     (ignore-errors (magit-toplevel)))
+                                default-directory))
          (files (split-string
                  (shell-command-to-string "git diff --name-only --diff-filter=U --relative")
                  "\n" t))
          (buf (buffer-file-name))
-         (idx (cl-position buf files :test #'string=)))
+         (idx (when buf (cl-position buf files :test #'string=))))
     (cond
      ((null files) (message "No conflicted files."))
      ((null idx)   (find-file (car files)))
@@ -35,22 +43,24 @@
 ;;;###autoload
 (defun promethean-lsp-append-gitignore-to-ignored-dirs (&optional root)
   "Append .gitignore-derived directory regexes to `lsp-file-watch-ignored-directories'.
- Does NOT overwrite lsp defaults."
+Does NOT overwrite lsp defaults."
   (interactive)
   (let* ((extra (promethean-lsp-gitignore-dir-regexes root))
          (current (if (local-variable-p 'lsp-file-watch-ignored-directories)
                       lsp-file-watch-ignored-directories
                     (default-value 'lsp-file-watch-ignored-directories)))
          (merged (cl-remove-duplicates (append current extra) :test #'string=)))
-    ;; Make it buffer-local so you can vary per project/buffer; use setq-default if you want global.
     (setq-local lsp-file-watch-ignored-directories merged)
     (message "lsp-file-watch-ignored-directories: +%d (total %d)"
              (length extra) (length merged))
     merged))
+
 ;;;###autoload
 (defun promethean-lsp-load-gitignore-ignores (&optional project-root)
-  "Merge .gitignore dirs into `lsp-file-watch-ignored-directories` for this project root."
-  (let* ((root (or project-root (lsp-workspace-root) default-directory))
+  "Merge .gitignore dirs into `lsp-file-watch-ignored-directories' for this project root."
+  (let* ((root (or project-root
+                   (and (fboundp 'lsp-workspace-root) (lsp-workspace-root))
+                   default-directory))
          (extra (promethean-lsp-gitignore-dir-regexes root))
          (base (default-value 'lsp-file-watch-ignored-directories))
          (merged (cl-remove-duplicates (append base extra) :test #'string=)))
@@ -66,7 +76,6 @@
 
 (defun promethean--gitglob-to-dir-regex (glob)
   "Convert a Git ignore GLOB (directory-ish) to an LSP directory regexp string.
-
 - Returns nil if GLOB looks like a file pattern (no trailing slash and contains a dot with no wildcard).
 - Translates * -> \".*\", ? -> \".\"
 - Anchors like LSP defaults: start with \"/\" and end with \"\\\\'\"."
@@ -113,17 +122,4 @@ Only directory patterns are converted."
               (when rx (push rx out))))))
         (nreverse (delete-dups out))))))
 
-(defun promethean-lsp-append-gitignore-to-ignored-dirs (&optional root)
-  "Append .gitignore-derived directory regexes to `lsp-file-watch-ignored-directories'.
-Does NOT overwrite lsp defaults."
-  (interactive)
-  (let* ((extra (promethean-lsp-gitignore-dir-regexes root))
-         (current (if (local-variable-p 'lsp-file-watch-ignored-directories)
-                      lsp-file-watch-ignored-directories
-                    (default-value 'lsp-file-watch-ignored-directories)))
-         (merged (cl-remove-duplicates (append current extra) :test #'string=)))
-    ;; Make it buffer-local so you can vary per project/buffer; use setq-default if you want global.
-    (setq-local lsp-file-watch-ignored-directories merged)
-    (message "lsp-file-watch-ignored-directories: +%d (total %d)"
-             (length extra) (length merged))
-    merged))
+;;; funcs.el ends here

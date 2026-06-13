@@ -1,74 +1,41 @@
-;;; funcs.el --- codex‑cli functions -*- lexical-binding: t; -*-
+;;; funcs.el --- codex layer functions -*- lexical-binding: t; -*-
 ;;; Commentary:
-;; Functions to interact with Codex CLI.
+;; Functions to interact with the OpenAI Codex CLI.
 
-;; (require 'project)
-;; (require 'cl-lib)
+;;; Code:
 
-;; (defun codex‑cli--project-root ()
-;;   "Return the root directory of the current project, or nil."
-;;   (or (project-root (project-current))
-;;       (locate-dominating-file default-directory ".git")
-;;       default-directory))
-
-;; (defun codex‑cli--build-command (mode prompt)
-;;   "Construct codex CLI command as a string for MODE and PROMPT.
-;; MODE is one of \"suggest\", \"auto-edit\", or \"full-auto\"."
-;;   (format "codex --approval-mode %s %s"
-;;           mode
-;;           (shell-quote-argument prompt)))
-
-;; (defun codex‑cli‑send-buffer (mode)
-;;   "Send the current buffer contents to Codex CLI with MODE.
-;; MODE is e.g. \"suggest\", \"auto-edit\", or \"full-auto\"."
-;;   (let* ((root (codex‑cli--project-root))
-;;          (prompt (read-string "Prompt for Codex: "))
-;;          (cmd (codex‑cli--build-command mode prompt))
-;;          (buff (current-buffer))
-;;          (file (buffer-file-name buff)))
-;;     (unless file
-;;       (error "Buffer is not visiting a file"))
-;;     (let ((default-directory root))
-;;       (async-shell-command
-;;        (concat cmd " <" (shell-quote-argument file))
-;;        "*Codex CLI Output*" "*Codex CLI Error*"))))
-
-;; (defun codex‑cli‑suggest-current ()
-;;   "Run Codex CLI in suggest mode on current file."
-;;   (interactive)
-;;   (codex‑cli‑send-buffer "suggest"))
-
-;; (defun codex‑cli‑auto‑edit-current ()
-;;   "Run Codex CLI in auto-edit mode on current file."
-;;   (interactive)
-;;   (codex‑cli‑send-buffer "auto-edit"))
-
-;; (defun codex‑cli-full‑auto‑current ()
-;;   "Run Codex CLI in full-auto mode on current file."
-;;   (interactive)
-;;   (codex‑cli‑send-buffer "full-auto"))
-;;; funcs.el ends here
-;;; funcs.el --- codex layer
 (require 'json)
 (require 'subr-x)
-;; Needed for cl-labels and seq-filter
 (require 'cl-lib)
 (require 'seq)
 
 (defun codex--project-root ()
+  "Return the current project root."
   (or (and (fboundp 'projectile-project-root) (projectile-project-root))
-      (and (fboundp 'project-current) (when-let ((pr (project-current))) (car (project-roots pr))))
+      (and (fboundp 'project-current)
+           (when-let ((pr (project-current)))
+             (project-root pr)))
       default-directory))
 
 (defun codex--git-branch ()
+  "Return the current git branch, or empty string."
   (string-trim (or (ignore-errors (shell-command-to-string "git rev-parse --abbrev-ref HEAD")) "")))
 
 (defun codex--git-diff-summary ()
-  (let* ((cmd "git --no-pager diff --stat -- .")
+  "Return a git diff stat, or empty string."
+  (let* ((default-directory (codex--project-root))
+         (cmd "git --no-pager diff --stat -- .")
          (out (ignore-errors (shell-command-to-string cmd))))
     (if (and out (> (length out) 0)) out "")))
 
+(defun codex--git-hunks (file n)
+  "Return git diff hunks for FILE with N context lines."
+  (let* ((default-directory (codex--project-root))
+         (cmd (format "git --no-pager diff -U%d -- %s" n (shell-quote-argument file))))
+    (or (ignore-errors (shell-command-to-string cmd)) "")))
+
 (defun codex--flycheck-errors ()
+  "Return current Flycheck errors as a string, or nil."
   (when (and codex-include-flycheck-errors (bound-and-true-p flycheck-current-errors))
     (mapconcat
      (lambda (e)
@@ -81,6 +48,7 @@
      "\n")))
 
 (defun codex--lsp-symbols ()
+  "Return current LSP document symbols as a string, or empty string."
   (when (and codex-include-lsp-context
              (boundp 'lsp-mode) lsp-mode
              (fboundp 'lsp-request)
@@ -95,7 +63,9 @@
               (format "LSP symbols: %s" names)
             ""))
       (error ""))))
+
 (defun codex--buffer-chunk ()
+  "Return region or buffer contents, capped by `codex-context-max-bytes'."
   (let* ((sel (if (use-region-p)
                   (buffer-substring-no-properties (region-beginning) (region-end))
                 (buffer-substring-no-properties (point-min) (point-max)))))
@@ -103,24 +73,45 @@
         sel
       (let* ((limit codex-context-max-bytes)
              (i (min (length sel) limit)))
-        ;; Decrease index until byte size fits limit
         (while (and (> i 0)
                     (> (string-bytes (substring sel 0 i)) limit))
           (setq i (1- i)))
         (substring sel 0 i)))))
 
+(defun codex--approx-tokens (s)
+  "Rough token estimate: bytes / 4."
+  (/ (max 1 (string-bytes s)) 4))
+
+(defun codex--strip-noise (txt)
+  "Naive comment stripping for JS/TS buffers."
+  (let ((case-fold-search nil))
+    (setq txt (replace-regexp-in-string "^\\s-*//.*$" "" txt))
+    (setq txt (replace-regexp-in-string "/\\*\\(.\\|\n\\)*?\\*/" "" txt))
+    (replace-regexp-in-string "^[ \t]+$" "" txt)))
+
+(defun codex--compact-context (txt file)
+  "Return (:text :hunks) with optional token-budget trimming."
+  (let* ((base (codex--strip-noise txt))
+         (est (codex--approx-tokens base)))
+    (when (> est codex-token-budget)
+      (setq base (substring base 0 (min (length base) (* 4 codex-token-budget)))))
+    (let* ((hunks (when (and file (file-exists-p file))
+                    (codex--git-hunks file codex-diff-context-lines))))
+      (list :text base :hunks hunks))))
+
 (defun codex--build-prompt (kind user-prompt)
-  "Build a markdown-ish prompt Codex understands well."
+  "Build a markdown-ish prompt for Codex CLI."
   (let* ((root (codex--project-root))
-         (rel (when (buffer-file-name)
-                (file-relative-name (buffer-file-name) root)))
+         (file buffer-file-name)
+         (rel (when (and file (file-exists-p file))
+                (file-relative-name file root)))
          (cursor (format "Cursor: line %d, column %d"
                          (line-number-at-pos (point)) (current-column)))
          (branch (codex--git-branch))
          (diff (if codex-include-git-summary (codex--git-diff-summary) ""))
+         (ctx (codex--compact-context (codex--buffer-chunk) file))
          (lsp (codex--lsp-symbols))
-         (errs (codex--flycheck-errors))
-         (body (codex--buffer-chunk)))
+         (errs (codex--flycheck-errors)))
     (string-join
      (seq-filter #'identity
                  (list
@@ -133,30 +124,27 @@
                   (format "- %s" cursor)
                   (when (and branch (> (length branch) 0)) (format "- Git branch: %s" branch))
                   (when (and diff (> (length diff) 0)) (concat "#### Git diff summary\n```\n" diff "\n```"))
+                  (when (plist-get ctx :hunks) (concat "#### Git hunks\n```\n" (plist-get ctx :hunks) "\n```"))
                   (when (and lsp (> (length lsp) 0)) (concat "#### LSP\n" lsp))
                   (when (and errs (> (length errs) 0)) (concat "#### Diagnostics\n```\n" errs "\n```"))
                   "#### Current Buffer/Region\n```text"
-                  body
+                  (plist-get ctx :text)
                   "```"
                   "#### Rules"
                   "- Make minimal, targeted edits."
                   "- Explain changes if non-trivial."
-                  "- Use project conventions; do not reformat unrelated code."
-                  ))
+                  "- Use project conventions; do not reformat unrelated code."))
      "\n\n")))
 
 (defun codex--call (prompt &optional root)
-  "Invoke codex; display output in a dedicated buffer.
-If Codex proposes edits, it will typically write to files directly (with approval flow)."
+  "Invoke codex and display output in a dedicated buffer."
   (let* ((default-directory (or root (codex--project-root)))
          (buf (get-buffer-create "*Codex*"))
-         (cmd (executable-find codex-cli-executable)))
+         (cmd (executable-find codex-executable)))
     (unless cmd
-      (user-error "Cannot find codex executable; set `codex-cli-executable`"))
+      (user-error "Cannot find codex executable; set `codex-executable`"))
     (with-current-buffer buf (erase-buffer))
     (let* ((proc (start-process "codex" buf cmd)))
-      ;; Feed prompt on STDIN; Codex supports “running with a prompt as input”.
-      ;; (Docs show non-interactive/CI scripting and prompt-from-stdin.)  :contentReference[oaicite:4]{index=4}
       (process-send-string proc (concat prompt "\n"))
       (process-send-eof proc)
       (display-buffer buf))))
@@ -180,3 +168,5 @@ If Codex proposes edits, it will typically write to files directly (with approva
   "Delegate a task to Codex with full project context."
   (interactive "sCodex task: ")
   (codex--call (codex--build-prompt "Implement task" prompt)))
+
+;;; funcs.el ends here

@@ -23,7 +23,7 @@
   :type '(repeat string)
   :group 'promethean-lisp)
 
-(when (boundp 'lsp-language-id-configuration)
+(with-eval-after-load 'lsp-mode
   (add-to-list 'lsp-language-id-configuration '(promethean-mode . "promethean")))
 
 ;;; config.el ends here

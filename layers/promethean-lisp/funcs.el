@@ -1,8 +1,12 @@
 ;;; funcs.el --- promethean-lisp helpers -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;; Helpers for the promethean-lisp layer.
+;; These functions reference variables from `promethean-mode'; they are only
+;; called after that package has been loaded by `promethean-lisp/init-promethean-mode'.
 
 ;;; Code:
+
+(require 'ert)
 
 (defface promethean-lisp-regex-test-face
   '((t :underline t :background "#333344"))
@@ -56,8 +60,6 @@
   (interactive)
   (ielm)
   (message "Promethean Lisp: IELM opened (placeholder REPL)"))
-
-(require 'ert)
 
 (ert-deftest promethean-regex-tests ()
   "Sanity checks for Promethean regexes."
