@@ -58,7 +58,7 @@ This function should only modify configuration layer settings."
      org
      github-copilot
 
-     prom-unique
+     unique-files
      (shell :variables
             shell-default-height 30
             shell-default-position 'bottom
@@ -76,6 +76,7 @@ This function should only modify configuration layer settings."
      codex
 
      promethean
+     promethean-lisp
      err-core
      err-ts
      err-commonlisp

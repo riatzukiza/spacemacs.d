@@ -1,0 +1,44 @@
+#+TITLE: promethean-lisp Layer
+#+AUTHOR: err
+#+DATE: 2026-06-12
+
+Spacemacs layer for Promethean Lisp, a personal Lisp dialect.  Provides a major
+mode, regex-test helpers, and optional LSP integration.
+
+* Files
+
+- =packages.el= :: Package list and LSP client registration.
+- =funcs.el= :: Helper commands and ERT regex tests.
+- =config.el= :: Layer variables (`promethean-lisp-lsp-enable`, etc.).
+- =promethean-mode.el= :: Major mode for =.prm= and =.promethean= files.
+- =keybindings.el= :: Evil leader bindings under ~SPC m~ for Promethean buffers.
+
+* Major mode bindings
+
+| Binding     | Command                              | Description                    |
+|-------------+--------------------------------------+--------------------------------|
+| ~SPC m =~   | `promethean-lisp-format-buffer`      | Indent entire buffer           |
+| ~SPC m r r~ | `promethean-lisp-open-repl`          | Open IELM placeholder REPL     |
+| ~SPC m l d~ | `lsp-find-definition`                | LSP goto definition            |
+| ~SPC m l D~ | `lsp-find-declaration`               | LSP goto declaration           |
+| ~SPC m l r~ | `lsp-find-references`                | LSP find references            |
+| ~SPC m l h~ | `lsp-describe-thing-at-point`        | LSP hover/docs                 |
+| ~SPC m l a~ | `lsp-execute-code-action`            | LSP code action                |
+| ~SPC m l f~ | `lsp-format-buffer`                  | LSP format buffer              |
+| ~SPC m l s~ | `lsp-workspace-folders-switch`       | LSP switch workspace folder    |
+| ~SPC m l R~ | `lsp-restart-workspace`              | LSP restart workspace          |
+| ~SPC m t k~ | `promethean-lisp-regex-test-keywords`| Flash keyword regex matches    |
+| ~SPC m t b~ | `promethean-lisp-regex-test-builtins`| Flash builtin regex matches    |
+| ~SPC m t c~ | `promethean-lisp-regex-test-const`   | Flash constant regex matches   |
+| ~SPC m t n~ | `promethean-lisp-regex-test-number`  | Flash number regex matches     |
+| ~SPC m t d~ | `promethean-lisp-regex-test-def-name`| Flash def-head regex matches   |
+
+* Customization
+
+- `promethean-lisp-lsp-enable` :: Whether to start LSP in Promethean buffers (default ~t~).
+- `promethean-lisp-lsp-command` :: LSP server executable (default ="promethean-lsp"=).
+- `promethean-lisp-lsp-args` :: Arguments for the server (default ='("--stdio")=).
+
+* Tests
+
+Run regex sanity tests with ~M-x ert RET promethean-regex-tests RET~.

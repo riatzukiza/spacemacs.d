@@ -1,0 +1,48 @@
+#+TITLE: unique-files Layer
+#+AUTHOR: err
+#+DATE: 2026-06-12
+
+Spacemacs layer for creating timestamped "unique" files per major mode, with
+Obsidian-style list continuation.
+
+* Commands
+
+| Binding   | Command                            | Description                          |
+|-----------+------------------------------------+--------------------------------------|
+| ~SPC n u u~ | `unique-files/open-like-this-buffer` | Unique file using current mode       |
+| ~SPC n u E~ | `unique-files/open-with-extension`   | Prompt for extension                 |
+| ~SPC n u m~ | `unique-files/open-markdown`         | Markdown unique file                 |
+| ~SPC n u o~ | `unique-files/open-org`              | Org unique file                      |
+| ~SPC n u t~ | `unique-files/open-text`             | Text unique file                     |
+| ~SPC n u j~ | `unique-files/open-js`               | JavaScript/JS-TS unique file         |
+| ~SPC n u M~ | `unique-files/open-for-mode`         | Prompt for mode                      |
+| ~SPC n l r~ | `unique-files/list-renumber-block`   | Renumber numeric list in region/para |
+
+Use a prefix argument (~C-u~) with any ~SPC n u ...~ create command to insert a
+mode-appropriate header.
+
+* Customization
+
+Set `unique-files-mode-targets` in your dotfile or via ~.dir-locals.el~ to
+override directories and extensions per project:
+
+#+begin_example elisp
+((nil . ((unique-files-mode-targets .
+          ((markdown-mode :dir "docs/md"   :ext ".md")
+           (org-mode      :dir "docs/org"  :ext ".org")
+           (text-mode     :dir "docs/text" :ext ".txt"))))))
+#+end_example
+
+* List continuation
+
+In ~text-mode~, ~markdown-mode~, and ~gfm-mode~, the layer enables list
+continuation on ~RET~.  If `orgalist' is installed it is used; otherwise a
+built-in fallback minor mode (`unique-files-list-continue-mode') provides the
+same behavior.
+
+* Files
+
+- =packages.el= :: Empty package list (layer uses built-ins only).
+- =funcs.el= :: Core unique-file helpers and list continuation code.
+- =config.el= :: Customizable variables and hook setup.
+- =keybindings.el= :: Spacemacs leader bindings.
