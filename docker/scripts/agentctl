@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+cmd="${1:-}"
+target="${2:-core}"
+
+case "$cmd" in
+  up)
+    if [[ "$target" == "all" ]]; then
+      docker compose up -d --build
+    else
+      docker compose up -d --build "$target"
+    fi
+    ;;
+  down)
+    if [[ "$target" == "all" ]]; then
+      docker compose down -v
+    else
+      docker compose rm -sf "$target"
+    fi
+    ;;
+  shell)
+    docker compose exec "$target" bash
+    ;;
+  logs)
+    docker compose logs -f "$target"
+    ;;
+  snapshot)
+    docker compose exec "$target" snapshot-i3
+    ;;
+  smoke)
+    docker compose exec "$target" smoke-i3
+    ;;
+  emacs)
+    shift
+    target="${1:-core}"
+    shift || true
+    docker compose exec "$target" agent-emacsclient "$@"
+    ;;
+  ps)
+    docker compose ps
+    ;;
+  *)
+    echo "usage: $0 {up|down|shell|logs|snapshot|smoke|emacs|ps} [core|spacemacs|dev|all] [args...]" >&2
+    exit 1
+    ;;
+esac

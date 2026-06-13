@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+export DISPLAY="${DISPLAY:-:99}"
+export XDG_RUNTIME_DIR="${XDG_RUNTIME_DIR:-/tmp/runtime-agent}"
+export EMACS_DAEMON_NAME="${EMACS_DAEMON_NAME:-agent-core}"
+mkdir -p "$XDG_RUNTIME_DIR"
+
+Xvfb "$DISPLAY" -screen 0 1600x1000x24 -nolisten tcp >/tmp/xvfb.log 2>&1 &
+XVFB_PID=$!
+
+for _ in $(seq 1 50); do
+  xdpyinfo -display "$DISPLAY" >/dev/null 2>&1 && break
+  sleep 0.1
+done
+
+if ! xdpyinfo -display "$DISPLAY" >/dev/null 2>&1; then
+  echo "Xvfb did not become ready on $DISPLAY" >&2
+  exit 1
+fi
+
+emacs --fg-daemon="$EMACS_DAEMON_NAME" >/tmp/emacs.log 2>&1 &
+EMACS_PID=$!
+
+i3 >/tmp/i3.log 2>&1 &
+I3_PID=$!
+
+cleanup() {
+  kill "$I3_PID" "$EMACS_PID" "$XVFB_PID" >/dev/null 2>&1 || true
+}
+trap cleanup EXIT INT TERM
+
+wait -n "$I3_PID" "$EMACS_PID" "$XVFB_PID"

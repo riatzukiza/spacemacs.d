@@ -1,0 +1,31 @@
+(defun dotspacemacs/layers ()
+  (setq-default
+   dotspacemacs-configuration-layers
+   '((emacs-lisp)
+     (shell :variables shell-default-shell 'eshell shell-default-term-shell "/bin/bash")
+     docker
+     agent-sandbox)
+   dotspacemacs-additional-packages
+   '()))
+
+(defun dotspacemacs/init ()
+  (setq-default
+   dotspacemacs-elpa-https t
+   dotspacemacs-editing-style 'vim
+   dotspacemacs-startup-banner 'official
+   dotspacemacs-scratch-mode 'text-mode))
+
+(defun dotspacemacs/user-init ())
+
+(defun dotspacemacs/user-config ()
+  (let* ((candidates (list (expand-file-name "layers/agent-sandbox" user-emacs-directory)
+                           (expand-file-name "private/agent-sandbox" user-emacs-directory)))
+         (layer-dir (seq-find #'file-directory-p candidates)))
+    (when layer-dir
+      (dolist (file '("config.el" "funcs.el" "keybindings.el"))
+        (let ((path (expand-file-name file layer-dir)))
+          (when (file-exists-p path)
+            (if (string= file "keybindings.el")
+                (when (fboundp 'spacemacs/set-leader-keys)
+                  (load-file path))
+              (load-file path))))))))
