@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+i3-msg -t get_version >/dev/null
+emacsclient -s "${EMACS_DAEMON_NAME:-agent-core}" -e '(progn (find-file "/workspace") t)' >/dev/null
+xterm -display "$DISPLAY" -e sh -lc 'sleep 2' >/tmp/smoke-xterm.log 2>&1 &
+sleep 1
+
+i3-msg -t get_tree | jq '.. | objects | select(.window_properties? and .window_properties.class? == "XTerm") | {name, focused, floating}'

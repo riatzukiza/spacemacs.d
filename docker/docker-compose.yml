@@ -1,0 +1,48 @@
+services:
+  core:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agent-i3-core
+    environment:
+      DISPLAY: ":99"
+      XDG_RUNTIME_DIR: "/tmp/runtime-agent"
+      EMACS_DAEMON_NAME: "agent-core"
+    volumes:
+      - ./:/workspace
+    working_dir: /workspace
+    tty: true
+    stdin_open: true
+
+  spacemacs:
+    build:
+      context: .
+      dockerfile: Dockerfile.spacemacs
+    container_name: agent-i3-spacemacs
+    environment:
+      DISPLAY: ":99"
+      XDG_RUNTIME_DIR: "/tmp/runtime-agent"
+      EMACS_DAEMON_NAME: "agent-spacemacs"
+    volumes:
+      - ./:/workspace
+    working_dir: /workspace
+    tty: true
+    stdin_open: true
+
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: agent-i3-dev
+    environment:
+      DISPLAY: ":99"
+      XDG_RUNTIME_DIR: "/tmp/runtime-agent"
+      EMACS_DAEMON_NAME: "agent-dev"
+    volumes:
+      - ./:/workspace
+      - ../layers/agent-sandbox:/home/agent/.emacs.d/private/agent-sandbox
+      - ./i3.config:/home/agent/.config/i3/config
+      - ./.spacemacs.agent:/home/agent/.spacemacs
+    working_dir: /workspace
+    tty: true
+    stdin_open: true
