@@ -1,10 +1,15 @@
 (defun agent/snapshot-i3-tree ()
   (interactive)
   (make-directory agent-sandbox-artifact-dir t)
-  (shell-command
-   (format "i3-msg -t get_tree > %s/tree.json && i3-msg -t get_workspaces > %s/workspaces.json"
-           (shell-quote-argument agent-sandbox-artifact-dir)
-           (shell-quote-argument agent-sandbox-artifact-dir))))
+  (let* ((ts (format-time-string "%Y%m%d-%H%M%S-%N"))
+         (tree-file (expand-file-name (format "tree-%s.json" ts) agent-sandbox-artifact-dir))
+         (workspaces-file (expand-file-name (format "workspaces-%s.json" ts) agent-sandbox-artifact-dir))
+         (tree-cmd (format "i3-msg -t get_tree > %s" (shell-quote-argument tree-file)))
+         (workspaces-cmd (format "i3-msg -t get_workspaces > %s" (shell-quote-argument workspaces-file)))
+         (status (shell-command (format "%s && %s" tree-cmd workspaces-cmd))))
+    (unless (zerop status)
+      (error "agent/snapshot-i3-tree failed in %s (exit %d)" agent-sandbox-artifact-dir status))
+    (message "Wrote %s and %s" tree-file workspaces-file)))
 
 (defun agent/open-workspace ()
   (interactive)

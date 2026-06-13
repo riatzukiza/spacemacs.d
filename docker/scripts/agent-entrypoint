@@ -14,6 +14,11 @@ for _ in $(seq 1 50); do
   sleep 0.1
 done
 
+if ! xdpyinfo -display "$DISPLAY" >/dev/null 2>&1; then
+  echo "Xvfb did not become ready on $DISPLAY" >&2
+  exit 1
+fi
+
 emacs --fg-daemon="$EMACS_DAEMON_NAME" >/tmp/emacs.log 2>&1 &
 EMACS_PID=$!
 

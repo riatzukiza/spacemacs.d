@@ -2,7 +2,7 @@
 set -euo pipefail
 out_dir="${1:-/workspace/.artifacts/i3}"
 mkdir -p "$out_dir"
-ts="$(date +%Y%m%d-%H%M%S)"
+ts="$(date +%Y%m%d-%H%M%S-%N)-$$"
 i3-msg -t get_tree > "$out_dir/tree-$ts.json"
 i3-msg -t get_workspaces > "$out_dir/workspaces-$ts.json"
 printf '%s\n' "$out_dir/tree-$ts.json" "$out_dir/workspaces-$ts.json"

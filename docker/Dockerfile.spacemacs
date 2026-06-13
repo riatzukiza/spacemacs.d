@@ -33,12 +33,12 @@ RUN useradd -m -s /bin/bash agent \
 USER agent
 WORKDIR /home/agent
 
-RUN git clone --depth 1 https://github.com/syl20bnr/spacemacs .emacs.d
+ARG SPACEMACS_REF=v0.9.1
+RUN git clone --branch ${SPACEMACS_REF} --depth 1 https://github.com/syl20bnr/spacemacs .emacs.d
 
 RUN mkdir -p /home/agent/.config/i3 /home/agent/.emacs.d/private /home/agent/bin
 COPY --chown=agent:agent i3.config /home/agent/.config/i3/config
 COPY --chown=agent:agent .spacemacs.agent /home/agent/.spacemacs
-COPY --chown=agent:agent private/ /home/agent/.emacs.d/private/
 COPY --chown=agent:agent scripts/ /home/agent/bin/
 RUN chmod +x /home/agent/bin/*
 

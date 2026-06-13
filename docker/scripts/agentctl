@@ -6,7 +6,11 @@ target="${2:-core}"
 
 case "$cmd" in
   up)
-    docker compose up -d --build "$target"
+    if [[ "$target" == "all" ]]; then
+      docker compose up -d --build
+    else
+      docker compose up -d --build "$target"
+    fi
     ;;
   down)
     if [[ "$target" == "all" ]]; then

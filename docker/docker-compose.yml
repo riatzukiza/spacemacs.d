@@ -25,6 +25,7 @@ services:
       EMACS_DAEMON_NAME: "agent-spacemacs"
     volumes:
       - ./:/workspace
+      - ../layers/agent-sandbox:/home/agent/.emacs.d/private/agent-sandbox
     working_dir: /workspace
     tty: true
     stdin_open: true

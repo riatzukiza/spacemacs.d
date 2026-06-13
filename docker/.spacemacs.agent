@@ -3,7 +3,8 @@
    dotspacemacs-configuration-layers
    '((emacs-lisp)
      (shell :variables shell-default-shell 'eshell shell-default-term-shell "/bin/bash")
-     docker)
+     docker
+     agent-sandbox)
    dotspacemacs-additional-packages
    '()))
 
@@ -17,8 +18,14 @@
 (defun dotspacemacs/user-init ())
 
 (defun dotspacemacs/user-config ()
-  (let ((layer-dir (expand-file-name "private/agent-sandbox" user-emacs-directory)))
-    (load-file (expand-file-name "config.el" layer-dir))
-    (load-file (expand-file-name "funcs.el" layer-dir))
-    (when (fboundp 'spacemacs/set-leader-keys)
-      (load-file (expand-file-name "keybindings.el" layer-dir)))))
+  (let* ((candidates (list (expand-file-name "layers/agent-sandbox" user-emacs-directory)
+                           (expand-file-name "private/agent-sandbox" user-emacs-directory)))
+         (layer-dir (seq-find #'file-directory-p candidates)))
+    (when layer-dir
+      (dolist (file '("config.el" "funcs.el" "keybindings.el"))
+        (let ((path (expand-file-name file layer-dir)))
+          (when (file-exists-p path)
+            (if (string= file "keybindings.el")
+                (when (fboundp 'spacemacs/set-leader-keys)
+                  (load-file path))
+              (load-file path))))))))
