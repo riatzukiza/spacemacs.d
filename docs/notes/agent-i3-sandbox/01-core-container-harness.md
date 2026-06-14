@@ -1,3 +1,9 @@
+---
+subject: agent-i3-sandbox
+tags: [agent-i3-sandbox, docker, i3, xvfb, emacs-daemon, container]
+created: 2026-06-12
+---
+
 ## Facts
 
 - Fact: Xvfb provides a virtual X display buffer so GUI programs can run headlessly, which makes it a good fit for a containerized i3 session. [tobyho](https://tobyho.com/2015/01/09/headless-browser-testing-xvfb/)

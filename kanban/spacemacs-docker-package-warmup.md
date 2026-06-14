@@ -5,7 +5,7 @@ status: "completed"
 priority: "P2"
 labels: ["docker", "spacemacs", "performance"]
 created_at: "2026-06-13T02:33:00Z"
-source: ".spacemacs.d/docs/notes/2026.06.13.02.33.49.md"
+source: ".spacemacs.d/docs/notes/agent-i3-sandbox/03-control-script-and-first-fixes.md"
 points: 3
 category: "infrastructure"
 ---

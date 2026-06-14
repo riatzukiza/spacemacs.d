@@ -1,3 +1,9 @@
+---
+subject: emacs-launcher
+tags: [emacs-launcher, rofi, emacsclient, i3-modes, wm-go]
+created: 2026-06-13
+---
+
 Yes — I’d make rofi the fast, dumb selector and Emacs the semantic backend. Rofi is explicitly a launcher and dmenu replacement that filters a textual list, while i3 supports binding modes for modal key sequences, so the natural shape is “rofi chooses an entity, then a bridge script dispatches to `emacsclient` or `i3-msg`.” [i3wm](https://i3wm.org/docs/userguide.html)
 
 ## Facts

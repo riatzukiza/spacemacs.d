@@ -5,7 +5,7 @@ status: "completed"
 priority: "P1"
 labels: ["infrastructure", "docker", "spacemacs", "layer"]
 created_at: "2026-06-13T02:13:00Z"
-source: ".spacemacs.d/docs/notes/2026.06.13.02.13.23.md"
+source: ".spacemacs.d/docs/notes/agent-i3-sandbox/02-optional-spacemacs-target-layer-architecture.md"
 points: 5
 category: "infrastructure"
 ---

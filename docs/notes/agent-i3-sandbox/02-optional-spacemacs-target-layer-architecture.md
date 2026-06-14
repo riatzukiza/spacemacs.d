@@ -1,3 +1,9 @@
+---
+subject: agent-i3-sandbox
+tags: [agent-i3-sandbox, spacemacs, private-layer, docker-target, layer-architecture]
+created: 2026-06-13
+---
+
 Yes — I would make Spacemacs an **optional target**, not the base image. Spacemacs can absolutely live in a container, but fresh installs and full package bootstrap can be slow enough that a lean default target is better for fast i3/E2E loops, while a second target gives you Spacemacs parity when you actually need layer behavior or private-layer code under test. [github](https://github.com/syl20bnr/spacemacs/issues/5658)
 
 ## Facts
