@@ -5,7 +5,7 @@ status: "completed"
 priority: "P2"
 labels: ["ux", "helm", "i3", "emacs"]
 created_at: "2026-06-13T02:26:00Z"
-source: ".spacemacs.d/docs/notes/2026.06.13.02.26.06.md"
+source: ".spacemacs.d/docs/notes/emacs-launcher/04-helm-popup-frame-in-i3.md"
 points: 3
 category: "ux"
 ---

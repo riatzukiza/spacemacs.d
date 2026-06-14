@@ -1,3 +1,9 @@
+---
+subject: emacs-launcher
+tags: [emacs-launcher, helm, consult, vertico, ivy, rofi, minibuffer-frame]
+created: 2026-06-13
+---
+
 Yes: if your goal is a **rofi-like** launcher, Helm is probably not the best fit. Helm is excellent at completion, but its normal UI keeps candidates in a separate Helm buffer or frame, while a rofi-style launcher is much easier to build with a minibuffer-native stack such as Consult plus Vertico, or Ivy, because those workflows center the interaction in the minibuffer itself. [reddit](https://www.reddit.com/r/emacs/comments/uqsogq/integrating_the_window_manager_and_emacs/)
 
 ## Facts

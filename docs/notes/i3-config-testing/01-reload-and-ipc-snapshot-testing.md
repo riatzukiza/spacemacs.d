@@ -1,3 +1,9 @@
+---
+subject: i3-config-testing
+tags: [i3, testing, xephyr, ipc, snapshot, reload]
+created: 2026-06-13
+---
+
 The best way is to treat i3 config work like systems programming: fast local reloads for the edit loop, a nested X server for risky changes, and snapshot-based assertions over the i3 IPC tree for integration tests. i3 explicitly supports config reload/restart, exposes the full layout tree over IPC, and its IPC docs even call out remote control as useful for writing test cases. [github](https://github.com/i3/i3/discussions/5775)
 
 ## Facts

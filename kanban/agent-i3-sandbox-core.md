@@ -5,7 +5,7 @@ status: "completed"
 priority: "P0"
 labels: ["infrastructure", "docker", "i3", "emacs"]
 created_at: "2026-06-13T02:40:00Z"
-source: ".spacemacs.d/docs/notes/2026.06.12.22.40.53.md"
+source: ".spacemacs.d/docs/notes/agent-i3-sandbox/01-core-container-harness.md"
 points: 5
 category: "infrastructure"
 ---
