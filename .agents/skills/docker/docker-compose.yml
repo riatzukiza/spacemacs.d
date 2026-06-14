@@ -3,6 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    image: agent-i3-core
     container_name: agent-i3-core
     environment:
       DISPLAY: ":99"
@@ -18,7 +19,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.spacemacs
+      args:
+        CORE_IMAGE: agent-i3-core
+    image: agent-i3-spacemacs
     container_name: agent-i3-spacemacs
+    depends_on:
+      - core
     environment:
       DISPLAY: ":99"
       XDG_RUNTIME_DIR: "/tmp/runtime-agent"
@@ -34,6 +40,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
+      args:
+        SPACEMACS_REF: develop
+    image: agent-i3-dev
     container_name: agent-i3-dev
     environment:
       DISPLAY: ":99"

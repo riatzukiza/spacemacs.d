@@ -30,7 +30,9 @@ This function is called at the very end of Spacemacs startup, after layer
 configuration."
   (load (expand-file-name "config/lsp.el" dotspacemacs-directory))
   (load (expand-file-name "config/frame-title.el" dotspacemacs-directory))
-  (load (expand-file-name "config/helm-popup.el" dotspacemacs-directory)))
+  (load (expand-file-name "config/helm-popup.el" dotspacemacs-directory))
+  (load (expand-file-name "config/rofi-bridge.el" dotspacemacs-directory))
+  (load (expand-file-name "config/consult-launcher.el" dotspacemacs-directory)))
 
 
 ;; Do not write anything past this comment. This is where Emacs will

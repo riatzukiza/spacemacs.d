@@ -82,7 +82,7 @@
     err-commonlisp
     )
 
- dotspacemacs-additional-packages '(yasnippet-snippets prettier-js lsp-sonarlint obsidian)
+ dotspacemacs-additional-packages '(yasnippet-snippets prettier-js lsp-sonarlint obsidian vertico consult)
  dotspacemacs-frozen-packages '()
  dotspacemacs-excluded-packages '()
 

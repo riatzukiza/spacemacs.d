@@ -5,14 +5,13 @@ ENV DEBIAN_FRONTEND=noninteractive \
     XDG_RUNTIME_DIR=/tmp/runtime-agent \
     HOME=/home/agent \
     SHELL=/bin/bash \
-    EMACS_DAEMON_NAME=agent-spacemacs
+    EMACS_DAEMON_NAME=agent-core
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
     ca-certificates \
     dbus-x11 \
     emacs \
-    git \
     i3-wm \
     jq \
     procps \
@@ -21,7 +20,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     x11-apps \
     xauth \
     xdotool \
-    xdpyinfo \
+    x11-utils \
     xvfb \
     xterm \
  && rm -rf /var/lib/apt/lists/*
@@ -31,16 +30,13 @@ RUN useradd -m -s /bin/bash agent \
  && chown -R agent:agent /workspace /tmp/runtime-agent /home/agent /opt/agent
 
 USER agent
-WORKDIR /home/agent
+WORKDIR /workspace
 
-ARG SPACEMACS_REF=v0.9.1
-RUN git clone --branch ${SPACEMACS_REF} --depth 1 https://github.com/syl20bnr/spacemacs .emacs.d
+RUN mkdir -p /home/agent/.config/i3 /home/agent/.emacs.d /home/agent/bin
 
-RUN mkdir -p /home/agent/.config/i3 /home/agent/.emacs.d/private /home/agent/bin
 COPY --chown=agent:agent i3.config /home/agent/.config/i3/config
-COPY --chown=agent:agent .spacemacs.agent /home/agent/.spacemacs
+COPY --chown=agent:agent init.el /home/agent/.emacs.d/init.el
 COPY --chown=agent:agent scripts/ /home/agent/bin/
 RUN chmod +x /home/agent/bin/*
 
-WORKDIR /workspace
 ENTRYPOINT ["/home/agent/bin/agent-entrypoint"]

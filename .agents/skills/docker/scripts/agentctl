@@ -26,16 +26,16 @@ case "$cmd" in
     docker compose logs -f "$target"
     ;;
   snapshot)
-    docker compose exec "$target" snapshot-i3
+    docker compose exec "$target" /home/agent/bin/snapshot-i3
     ;;
   smoke)
-    docker compose exec "$target" smoke-i3
+    docker compose exec "$target" /home/agent/bin/smoke-i3
     ;;
   emacs)
     shift
     target="${1:-core}"
     shift || true
-    docker compose exec "$target" agent-emacsclient "$@"
+    docker compose exec "$target" /home/agent/bin/agent-emacsclient "$@"
     ;;
   ps)
     docker compose ps
