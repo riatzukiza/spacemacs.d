@@ -1,3 +1,9 @@
+---
+subject: emacs-launcher
+tags: [emacs-launcher, helm, popup-frame, i3, for_window]
+created: 2026-06-13
+---
+
 Yes, but the cleanest answer is: make i3 float a specially named Emacs popup frame, not a literal minibuffer-only window. A true minibuffer-only frame exists in Emacs, but Helm normally keeps input in the minibuffer while showing candidates in a separate window or frame, so “just a Helm minibuffer” is not Helm’s normal display model. [github](https://github.com/i3/i3/discussions/5775)
 
 ## Architecture

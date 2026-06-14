@@ -5,7 +5,7 @@ status: "completed"
 priority: "P1"
 labels: ["testing", "i3", "xephyr", "ci"]
 created_at: "2026-06-13T02:16:00Z"
-source: ".spacemacs.d/docs/notes/2026.06.13.02.16.23.md"
+source: ".spacemacs.d/docs/notes/i3-config-testing/01-reload-and-ipc-snapshot-testing.md"
 points: 5
 category: "testing"
 ---

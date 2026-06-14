@@ -5,7 +5,7 @@ status: "completed"
 priority: "P1"
 labels: ["ux", "rofi", "emacs", "i3"]
 created_at: "2026-06-13T02:25:00Z"
-source: ".spacemacs.d/docs/notes/2026.06.13.02.25.21.md"
+source: ".spacemacs.d/docs/notes/emacs-launcher/02-rofi-emacsclient-bridge.md"
 points: 3
 category: "ux"
 ---

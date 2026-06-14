@@ -1,3 +1,9 @@
+---
+subject: emacs-launcher
+tags: [emacs-launcher, vertico, consult, helm, completion]
+created: 2026-06-13
+---
+
 Vertico is the **UI** part: a lightweight Emacs package that presents completion candidates vertically in the minibuffer and plugs directly into Emacs’s built-in completion system instead of introducing its own separate API. [reddit](https://www.reddit.com/r/emacs/comments/1kxibr1/my_gnu_emacs_settings_for_the_vertico_package_as/)
 Consult is the **command** part: a package that provides richer search and navigation commands on top of Emacs’s `completing-read`, such as better buffer switching, line search, and other jump/search workflows. [github](https://github.com/minad/consult)
 

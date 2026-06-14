@@ -1,3 +1,9 @@
+---
+subject: agent-i3-sandbox
+tags: [agent-i3-sandbox, docker-compose, agentctl, smoke-test, dev-target]
+created: 2026-06-13
+---
+
 I wrote the two-image setup plus the control script: a fast `core` target and a slower `spacemacs` target, with Docker Compose wiring, entrypoint boot logic, and helper scripts for `emacsclient`, i3 snapshots, and smoke testing. The split matches the design we discussed: keep the default loop lightweight, and only pay the Spacemacs bootstrap cost when you actually need layer-level behavior under test. [github](https://github.com/syl20bnr/spacemacs/issues/8144)
 
 ## What’s in it

@@ -5,7 +5,7 @@ status: "completed"
 priority: "P2"
 labels: ["ux", "consult", "vertico", "emacs", "i3"]
 created_at: "2026-06-13T02:25:00Z"
-source: ".spacemacs.d/docs/notes/2026.06.13.02.25.51.md"
+source: ".spacemacs.d/docs/notes/emacs-launcher/03-minibuffer-native-launcher-options.md"
 points: 3
 category: "ux"
 ---
