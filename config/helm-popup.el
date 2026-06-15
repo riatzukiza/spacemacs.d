@@ -1,7 +1,7 @@
 ;; -*- mode: emacs-lisp; lexical-binding: t -*-
 ;;; config/helm-popup.el --- Floating Helm popup frame  -*- lexical-binding: t; -*-
 ;;; Commentary:
-;; Spotlight-style floating Helm frames via leader bindings.
+;; Spotlight-style floating Helm frames via leader and i3 bindings.
 ;; Loaded by `dotspacemacs/user-config'.
 
 ;;; Code:
@@ -23,30 +23,42 @@
     (horizontal-scroll-bars . nil))
   "Default frame parameters for the Helm popup frame.")
 
+(defun err/helm-popup--show-in-new-frame (buffer)
+  "Display BUFFER in a new, focused frame."
+  (when (and buffer (buffer-live-p buffer))
+    (let ((frame (make-frame)))
+      (select-frame-set-input-focus frame)
+      (switch-to-buffer buffer)
+      (raise-frame frame)
+      (message "Opened: %s" (buffer-name buffer)))))
+
 (defun err/helm-popup (cmd)
   "Run Helm CMD in a small floating frame.
-The popup frame is destroyed when Helm exits.  If a Helm action opened a
-new buffer, that buffer is shown in the originally selected frame."
+The popup frame is destroyed when Helm exits.  Whatever buffer Helm left
+in the popup's selected window is then shown in a new focused frame so the
+result is always easy to find."
   (let* ((orig-frame (selected-frame))
          (orig-buffer (current-buffer))
-         (frame (make-frame err/helm-popup-frame-params)))
+         (frame (make-frame err/helm-popup-frame-params))
+         result-buffer)
     (set-frame-parameter frame 'frame-title-format err/helm-popup-frame-name)
     (set-frame-parameter frame 'icon-title-format err/helm-popup-frame-name)
     (select-frame-set-input-focus frame)
     (delete-other-windows)
     (unwind-protect
         (let ((helm-full-frame t)
-              (helm-display-function #'helm-default-display-buffer))
+              (helm-display-function #'helm-default-display-buffer)
+              (display-buffer-alist nil))
           (call-interactively cmd))
-      (let ((result-buffer (current-buffer)))
-        (when (and (not (eq result-buffer orig-buffer))
-                   (buffer-live-p result-buffer)
-                   (frame-live-p orig-frame))
-          (with-selected-frame orig-frame
-            (switch-to-buffer result-buffer)
-            (select-frame-set-input-focus orig-frame))))
       (when (frame-live-p frame)
-        (delete-frame frame)))))
+        (setq result-buffer (window-buffer (frame-selected-window frame)))
+        (delete-frame frame))
+      (when (and result-buffer
+                 (buffer-live-p result-buffer)
+                 (not (minibufferp result-buffer))
+                 (not (string-match-p "^\\*helm" (buffer-name result-buffer)))
+                 (not (eq result-buffer orig-buffer)))
+        (err/helm-popup--show-in-new-frame result-buffer)))))
 
 (defun err/helm-popup-find-files ()
   "Open `helm-find-files' in the popup frame."

@@ -7,13 +7,32 @@
 ;;; Code:
 
 (defun my/read-dir-context ()
-  "Return a context directory: current project root, buffer dir, or home."
-  (expand-file-name
-   (or (and (fboundp 'projectile-project-root)
-            (ignore-errors (projectile-project-root)))
-       (and (buffer-file-name) (file-name-directory (buffer-file-name)))
-       default-directory
-       "~/")))
+  "Return a context directory following the current-context rule.
+Precedence: current projectile project root, current buffer's directory,
+`default-directory', then an interactive prompt when no automatic context
+is available.  When called non-interactively, falls back to ~ instead of
+prompting so i3 keybindings do not hang."
+  (let* ((project-root (and (fboundp 'projectile-project-root)
+                            (ignore-errors (projectile-project-root))))
+         (buffer-dir (and (buffer-file-name)
+                          (file-name-directory (buffer-file-name))))
+         (candidates (delete-dups
+                      (delq nil (list project-root
+                                      buffer-dir
+                                      (and default-directory
+                                           (not (string= default-directory "~/"))
+                                           default-directory)
+                                      "~/"))))
+         (auto (or project-root
+                   buffer-dir
+                   (and default-directory
+                        (not (string= default-directory "~/"))
+                        default-directory))))
+    (expand-file-name
+     (or auto
+         (and (called-interactively-p 'interactive)
+              (completing-read "Context: " candidates nil t nil nil "~/"))
+         "~/"))))
 
 (defun my/rofi-lines (mode)
   "Return newline-separated rofi candidates for MODE.

@@ -1,3 +1,15 @@
+---
+uuid: "agent-i3-sandbox-review-fixes"
+title: "Address CodeRabbit review comments on PR #1"
+status: "review"
+priority: "P1"
+labels: ["infrastructure", "docker", "spacemacs", "review"]
+created_at: "2026-06-13T00:00:00Z"
+source: ".spacemacs.d/spec/agent-i3-sandbox-review-fixes.md"
+points: 5
+category: "infrastructure"
+---
+
 # Spec: Address CodeRabbit review comments on PR #1
 
 ## PR under review

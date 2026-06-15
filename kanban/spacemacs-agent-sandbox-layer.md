@@ -1,7 +1,7 @@
 ---
 uuid: "spacemacs-agent-sandbox-layer"
 title: "Create private Spacemacs agent-sandbox layer"
-status: "completed"
+status: "review"
 priority: "P1"
 labels: ["spacemacs", "layer", "emacs-lisp"]
 created_at: "2026-06-13T02:13:00Z"

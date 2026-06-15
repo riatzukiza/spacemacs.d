@@ -1,3 +1,15 @@
+---
+uuid: "kanban-implementation-2026-06-13"
+title: "Implement Spacemacs/i3 DevOps Kanban"
+status: "review"
+priority: "P0"
+labels: ["process", "kanban", "spacemacs", "i3", "docker"]
+created_at: "2026-06-13T00:00:00Z"
+source: ".spacemacs.d/spec/kanban-implementation-2026-06-13.md"
+points: 13
+category: "process"
+---
+
 # Spec: Implement Spacemacs/i3 DevOps Kanban
 
 ## Scope

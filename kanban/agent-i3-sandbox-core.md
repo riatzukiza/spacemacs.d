@@ -1,7 +1,7 @@
 ---
 uuid: "agent-i3-sandbox-core"
 title: "Build core agent i3 sandbox container target"
-status: "completed"
+status: "review"
 priority: "P0"
 labels: ["infrastructure", "docker", "i3", "emacs"]
 created_at: "2026-06-13T02:40:00Z"
