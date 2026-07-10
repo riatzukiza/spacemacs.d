@@ -1,3 +1,8 @@
+---
+name: agent-i3-sandbox
+description: Provision an isolated X11/i3/Emacs agent sandbox in Docker. Use when an agent needs a headless desktop, window-manager automation, i3 config testing, or named Emacs daemon isolation without touching the operator's live session.
+---
+
 # Skill: agent-i3-sandbox
 
 Provision an isolated workspace for an autonomous agent with its own X11 display,
@@ -5,12 +10,55 @@ i3 instance, and named Emacs daemon so it can manipulate windows, run editor
 automations, and inspect i3 IPC state without touching the operator's live
 desktop.
 
+## Location
+
+This skill is self-contained under:
+
+```
+~/.spacemacs.d/.agents/skills/agent-i3-sandbox/
+├── SKILL.md
+├── docker-compose.yml
+├── Dockerfile
+├── Dockerfile.spacemacs
+├── Dockerfile.dev
+├── i3.config
+├── init.el
+├── .spacemacs.agent
+└── scripts/
+    ├── agentctl
+    ├── agent-entrypoint
+    ├── agent-emacsclient
+    ├── snapshot-i3
+    ├── smoke-i3
+    └── warmup-spacemacs
+```
+
+All scripts are here. Do not assume they need to be created elsewhere.
+
 ## Use when
 
 - an agent must hack on i3 config safely,
 - an agent needs background Emacs automation,
 - window-manager integration or E2E testing is required,
-- the operator must keep using their own desktop uninterrupted.
+- the operator must keep using their own desktop uninterrupted,
+- validating i3 keybindings, Helm/Consult popups, emacsclient bridges, or any window-manager/Emacs integration that would normally require interacting with the operator's live X session.
+
+## Important
+
+Do not iterate on i3 or Emacs window-manager integrations directly in the
+operator's live session. Use this sandbox to reproduce the setup, run the
+commands, take screenshots or i3 IPC snapshots, and only then apply the proven
+changes to the operator's real config.
+
+The intended workflow for WM/Emacs integration work is:
+
+1. Copy or mount the operator's i3/Spacemacs config into the sandbox (use the
+   `dev` target or bind-mount from the host).
+2. Reproduce the issue inside the container.
+3. Apply candidate fixes and verify with `agentctl smoke`, `agentctl snapshot`,
+   `import` screenshots, or `xdotool`/key simulations.
+4. Once the behavior is correct, copy the final config back to the operator's
+   live paths and reload.
 
 ## Architecture
 

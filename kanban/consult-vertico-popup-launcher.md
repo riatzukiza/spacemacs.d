@@ -1,7 +1,7 @@
 ---
 uuid: "consult-vertico-popup-launcher"
 title: "Build Consult/Vertico minibuffer popup launcher"
-status: "completed"
+status: "review"
 priority: "P2"
 labels: ["ux", "consult", "vertico", "emacs", "i3"]
 created_at: "2026-06-13T02:25:00Z"

@@ -1,89 +1,57 @@
 ;; Π STATE — deterministic handoff snapshot
 ;; repo: /home/err/.spacemacs.d
-;; branch: main
-;; timestamp: 2026-06-14T14:03:55Z
-;; tag: Π-2026.06.14-140355
+;; branch: chore/organize-notes
+;; timestamp: 2026-07-10T16:54:08Z
+;; tag: Π/2026-07-10/165408-9a3e0fa
 
 (Π
   (meta
-    (timestamp "2026-06-14T14:03:55Z")
-    (branch "main")
+    (timestamp "2026-07-10T16:54:08Z")
+    (branch "chore/organize-notes")
     (remote "git@github.com:riatzukiza/spacemacs.d.git")
-    (tag "Π-2026.06.14-140355"))
+    (tag "Π/2026-07-10/165408-9a3e0fa"))
 
   (base
-    (commit-before "38046a9 Merge pull request #2 from riatzukiza/fix/agent-i3-sandbox-review"))
+    (commit-before "9a3e0fa Π: fork-tax snapshot 2026-06-15T02:56:21Z"))
 
   (scope
-    (summary "Spacemacs/i3 DevOps Kanban implementation snapshot"))
+    (summary "Agent-shell workflow integration, i3-sandbox test scaffolding, OpenCode permissions"))
 
   (changes
     (modified
+      .agents/skills/agent-i3-sandbox/Dockerfile.dev
+      .gitignore
+      .spacemacs.env
+      config/helm-popup.el
       core/layers.el
       init.el
-      layers/agent-sandbox/config.el
-      layers/agent-sandbox/funcs.el
-      layers/agent-sandbox/keybindings.el
-      layers/agent-sandbox/packages.el)
-    (deleted
-      docker/.spacemacs.agent
-      docker/Dockerfile
-      docker/Dockerfile.dev
-      docker/Dockerfile.spacemacs
-      docker/docker-compose.yml
-      docker/i3.config
-      docker/init.el
-      docker/scripts/agent-emacsclient
-      docker/scripts/agent-entrypoint
-      docker/scripts/agentctl
-      docker/scripts/snapshot-i3
-      docker/scripts/smoke-i3)
+      opencode.jsonc)
     (added
-      docs/notes/2026.06.12.22.40.53.md
-      docs/notes/2026.06.13.02.13.23.md
-      docs/notes/2026.06.13.02.16.23.md
-      docs/notes/2026.06.13.02.25.04.md
-      docs/notes/2026.06.13.02.25.21.md
-      docs/notes/2026.06.13.02.25.51.md
-      docs/notes/2026.06.13.02.26.06.md
-      docs/notes/2026.06.13.02.33.49.md
-      docs/notes/2026.06.13.05.20.00.md
-      docs/notes/2026.06.13.05.27.13.md
-      spec/kanban-implementation-2026-06-13.md
-      kanban/agent-i3-sandbox-core.md
-      kanban/agent-i3-sandbox-dev.md
-      kanban/agent-i3-sandbox-spacemacs.md
-      kanban/consult-vertico-popup-launcher.md
-      kanban/helm-popup-frame-i3.md
-      kanban/i3-config-test-harness.md
-      kanban/named-emacs-daemons.md
-      kanban/rofi-emacsclient-bridge.md
-      kanban/spacemacs-agent-sandbox-layer.md
-      kanban/spacemacs-docker-package-warmup.md
-      config/consult-launcher.el
-      config/rofi-bridge.el
-      layers/agent-sandbox/layers.el
-      .gitignore
-      .ημ/PRINCIPLE.edn)
-    (untracked-absorbed
-      .agents/skills/docker
-      .eta-mu))
+      .agents/skills/agent-i3-sandbox/docker-compose.test.yml
+      .agents/skills/agent-i3-sandbox/scripts/helm-spotlight
+      .agents/skills/agent-i3-sandbox/scripts/install-agent-shell.el
+      .agents/skills/agent-i3-sandbox/scripts/test-agent-shell-layout
+      .agents/skills/agent-i3-sandbox/scripts/test-e2e-agent-shell-project
+      .agents/skills/agent-i3-sandbox/scripts/test-i3-keybinding
+      config/agent-shell.el
+      docs/notes/2026.06.15.14.56.54.md
+      docs/notes/2026.06.15.22.57.52.md))
 
   (verification
-    (make-test "19/19 passed")
+    (make-test "19/19 passed; make exited with code 2 despite passing tests")
+    (elisp-syntax "OK")
     (shell-syntax "OK")
-    (docker-compose-build-core "OK")
-    (docker-compose-build-spacemacs "OK")
-    (docker-compose-build-dev "OK")
-    (agentctl-smoke "OK")
-    (agentctl-snapshot "OK")
-    (host-i3-config "OK")
     (secrets-scan "no real secrets found"))
 
   (blockers
     (none "No concurrent dirt blockers recorded at snapshot time."))
 
   (notes
-    "Docker/ scripts were relocated to .agents/skills/docker during this work."
-    "SPACEMACS_REF changed from v0.9.1 to develop in the relocated Docker build."
-    ".eta-mu is a symlink to .ημ; both are absorbed into the snapshot."))
+    "config/agent-shell.el adds project + agent-shell layout commands bound under SPC o a."
+    "core/layers.el adds agent-shell and acp to additional packages."
+    "init.el loads config/agent-shell.el and reformats custom-set-variables/custom-set-faces."
+    "config/helm-popup.el now requires helm and helm-projectile and sets display frame parameter."
+    "opencode.jsonc adds external_directory permission allow entries."
+    ".gitignore was corrected from a concatenated single line to two separate lines."
+    ".agents/skills/agent-i3-sandbox/Dockerfile.dev moves to debian:trixie-slim."
+    "helm-spotlight script is currently empty (0 bytes)."))

@@ -1,7 +1,7 @@
 ---
 uuid: "spacemacs-docker-package-warmup"
 title: "Warm Spacemacs package installation in Docker build"
-status: "completed"
+status: "review"
 priority: "P2"
 labels: ["docker", "spacemacs", "performance"]
 created_at: "2026-06-13T02:33:00Z"

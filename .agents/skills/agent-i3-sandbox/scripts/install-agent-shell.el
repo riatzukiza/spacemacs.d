@@ -1,0 +1,6 @@
+(require 'package)
+(setq package-user-dir "/home/agent/.emacs.d/elpa/30.1/develop")
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+(package-initialize)
+(package-refresh-contents)
+(package-install 'agent-shell)

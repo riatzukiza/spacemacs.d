@@ -1,7 +1,7 @@
 ---
 uuid: "i3-config-test-harness"
 title: "Build Xephyr-based i3 config test harness"
-status: "completed"
+status: "review"
 priority: "P1"
 labels: ["testing", "i3", "xephyr", "ci"]
 created_at: "2026-06-13T02:16:00Z"

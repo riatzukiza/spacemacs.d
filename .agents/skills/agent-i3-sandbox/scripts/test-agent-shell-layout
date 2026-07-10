@@ -1,0 +1,91 @@
+#!/usr/bin/env bash
+# Test the agent-shell project layout function programmatically.
+set -euo pipefail
+
+SOCKET="${EMACS_DAEMON_NAME:-agent-dev}"
+TEST_DIR="${1:-/tmp/agent-shell-layout-test}"
+mkdir -p "$TEST_DIR"
+
+# Pick a known projectile project if available, otherwise use the test dir.
+PROJECT_DIR=$(emacsclient -s "$SOCKET" -e "
+(let ((projects (and (fboundp 'projectile-relevant-known-projects)
+                     (projectile-relevant-known-projects))))
+  (car (or projects '(\"$TEST_DIR\"))))" 2>/dev/null | tr -d '\"')
+
+echo "==> Testing layout for project: $PROJECT_DIR"
+
+# Clear any existing frames with the agent-shell-project name.
+emacsclient -s "$SOCKET" -e "
+(dolist (frame (frame-list))
+  (when (equal (frame-parameter frame 'name) \"agent-shell-project\")
+    (delete-frame frame t)))" >/dev/null
+
+# Invoke the layout in a new frame with a mock shell function so the
+# test does not depend on agent configs or network processes.
+emacsclient -s "$SOCKET" -e "
+(let ((mock-shell-fn (lambda ()
+                       (let ((buf (get-buffer-create \"*agent-shell-layout-mock*\")))
+                         (with-current-buffer buf
+                           (erase-buffer)
+                           (insert \"Mock agent shell\n\"))
+                         (set-window-buffer (selected-window) buf)
+                         (selected-window)))))
+  (err/agent-shell-project-layout \"$PROJECT_DIR\" t mock-shell-fn))" >/dev/null
+
+sleep 2
+
+# Snapshot for diagnostic purposes.
+OUT_DIR="/workspace/.artifacts/layout-test"
+mkdir -p "$OUT_DIR"
+/home/agent/bin/snapshot-i3 "$OUT_DIR" > /dev/null
+
+# Verify the Emacs-internal window configuration instead of relying on i3
+# to see individual Emacs windows (i3 only sees the containing X frame).
+WINDOW_INFO=$(emacsclient -s "$SOCKET" -e "
+(let* ((frame (seq-find (lambda (f)
+                          (equal (frame-parameter f 'name)
+                                 \"agent-shell-project\"))
+                        (frame-list)))
+       (windows (when frame
+                  (sort (window-list frame)
+                        (lambda (a b) (< (window-top-line a)
+                                         (window-top-line b)))))))
+  (if (not frame)
+      '(error no-frame)
+    (format \"windows=%d top=%s bottom=%s bottom-buffer=%s\"
+            (length windows)
+            (with-current-buffer (window-buffer (nth 0 windows)) major-mode)
+            (with-current-buffer (window-buffer (nth 1 windows)) major-mode)
+            (buffer-name (window-buffer (nth 1 windows))))))" 2>/dev/null | tr '\n' ' ')
+
+echo "Window info: $WINDOW_INFO"
+
+if echo "$WINDOW_INFO" | grep -q 'no-frame'; then
+  echo "FAIL: agent-shell-project frame not found in Emacs." >&2
+  exit 1
+fi
+
+WINDOW_COUNT=$(echo "$WINDOW_INFO" | grep -oE 'windows=[0-9]+' | cut -d= -f2)
+if [[ "$WINDOW_COUNT" -lt 2 ]]; then
+  echo "FAIL: Expected 2 windows in the project frame, found $WINDOW_COUNT." >&2
+  exit 1
+fi
+echo "OK: Found $WINDOW_COUNT windows in the project frame."
+
+TOP_MODE=$(echo "$WINDOW_INFO" | grep -oE 'top=[^ ]+' | cut -d= -f2)
+BOTTOM_MODE=$(echo "$WINDOW_INFO" | grep -oE 'bottom=[^ ]+' | cut -d= -f2)
+BOTTOM_BUFFER=$(echo "$WINDOW_INFO" | grep -oE 'bottom-buffer=[^ ]+' | cut -d= -f2 | tr -d '\"')
+
+if [[ "$TOP_MODE" != "dired-mode" ]]; then
+  echo "FAIL: Top window is $TOP_MODE, expected dired-mode." >&2
+  exit 1
+fi
+echo "OK: Top window is dired-mode."
+
+if [[ "$BOTTOM_MODE" != "fundamental-mode" || "$BOTTOM_BUFFER" != "*agent-shell-layout-mock*" ]]; then
+  echo "FAIL: Bottom window is $BOTTOM_MODE ($BOTTOM_BUFFER), expected mock shell." >&2
+  exit 1
+fi
+echo "OK: Bottom window is the mock agent shell."
+
+echo "==> Layout test passed."
