@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+# End-to-end test: simulate the i3 keybinding and verify the result.
+set -euo pipefail
+
+SOCKET="${EMACS_DAEMON_NAME:-agent-dev}"
+OUT_DIR="/workspace/.artifacts/e2e-test"
+mkdir -p "$OUT_DIR"
+
+# Clean state.
+CLEAN_EXPR='(dolist (frame (frame-list))
+   (when (equal (frame-parameter frame '"'"'name) "agent-shell-project")
+     (delete-frame frame t)))'
+emacsclient -s "$SOCKET" -e "$CLEAN_EXPR" >/dev/null 2>&1 || true
+
+# Ensure a real projectile project exists for the test.
+TEST_PROJECT="/workspace/test-project"
+if [[ ! -d "$TEST_PROJECT/.git" ]]; then
+  mkdir -p "$TEST_PROJECT"
+  (
+    cd "$TEST_PROJECT"
+    git init -q
+    git config user.email "test@example.com"
+    git config user.name "Test"
+    echo "test" > README.md
+    git add README.md
+    git commit -qm "init"
+  )
+fi
+
+# Pre-seed a projectile project list so Helm has a candidate.
+ADD_PROJECT_EXPR='(when (fboundp '"'"'projectile-add-known-project)
+   (projectile-add-known-project "/workspace/test-project"))'
+emacsclient -s "$SOCKET" -e "$ADD_PROJECT_EXPR" >/dev/null 2>&1 || true
+
+# Set a non-interactive mock shell creator so the workflow completes without
+# starting a real ACP process.
+MOCK_SHELL_EXPR='(setq err/agent-shell-project-shell-function
+      (lambda ()
+        (let ((buf (get-buffer-create "*agent-shell-e2e-mock*")))
+          (with-current-buffer buf
+            (erase-buffer)
+            (insert "Mock agent shell\n"))
+          buf)))'
+emacsclient -s "$SOCKET" -e "$MOCK_SHELL_EXPR" >/dev/null 2>&1 || true
+
+echo "==> Simulating Mod+Ctrl+Shift+p key press..."
+
+# Use xdotool to send the keybinding. i3 uses Mod4 (Super) and Ctrl.
+xdotool key --clearmodifiers "Super+Ctrl+Shift+p"
+
+# Wait for Helm popup, then select the first candidate and the default action.
+sleep 5
+xdotool key --clearmodifiers Return
+sleep 5
+
+# Snapshot.
+/home/agent/bin/snapshot-i3 "$OUT_DIR" > /dev/null
+
+TREE_FILE=$(ls -t "$OUT_DIR"/tree-*.json | head -1)
+AGENT_FRAME=$(jq -r '[.. | objects | select(.window_properties? and .window_properties.class? == "Emacs" and .window_properties.title? == "agent-shell-project")] | length' "$TREE_FILE")
+if [[ "$AGENT_FRAME" -lt 1 ]]; then
+  echo "FAIL: agent-shell-project frame did not appear after keybinding." >&2
+  exit 1
+fi
+
+echo "OK: agent-shell-project frame appeared."
+
+# Verify the Emacs-internal layout.
+LAYOUT_EXPR='(let* ((frame (seq-find (lambda (f)
+                           (equal (frame-parameter f '"'"'name)
+                                  "agent-shell-project"))
+                         (frame-list)))
+         (windows (when frame
+                    (sort (window-list frame)
+                          (lambda (a b) (< (window-top-line a)
+                                           (window-top-line b)))))))
+    (if (not frame)
+        "no-frame"
+      (format "windows=%d top=%s top-buffer=%s bottom=%s bottom-buffer=%s"
+              (length windows)
+              (with-current-buffer (window-buffer (nth 0 windows)) major-mode)
+              (buffer-name (window-buffer (nth 0 windows)))
+              (with-current-buffer (window-buffer (nth 1 windows)) major-mode)
+              (buffer-name (window-buffer (nth 1 windows))))))'
+WINDOW_INFO=$(emacsclient -s "$SOCKET" -e "$LAYOUT_EXPR" 2>/dev/null | tr '\n' ' ')
+
+echo "Window info: $WINDOW_INFO"
+
+WINDOW_COUNT=$(echo "$WINDOW_INFO" | grep -oE 'windows=[0-9]+' | cut -d= -f2)
+if [[ "$WINDOW_COUNT" -lt 2 ]]; then
+  echo "FAIL: Expected 2 windows in the project frame, found $WINDOW_COUNT." >&2
+  exit 1
+fi
+
+TOP_MODE=$(echo "$WINDOW_INFO" | grep -oE 'top=[^ ]+' | cut -d= -f2)
+BOTTOM_BUFFER=$(echo "$WINDOW_INFO" | grep -oE 'bottom-buffer=[^ ]+' | cut -d= -f2 | tr -d '\"')
+
+if [[ "$TOP_MODE" != "dired-mode" ]]; then
+  echo "FAIL: Top window is $TOP_MODE, expected dired-mode." >&2
+  exit 1
+fi
+
+echo "OK: Top window is dired-mode."
+
+if [[ "$BOTTOM_BUFFER" != "*agent-shell-e2e-mock*" ]]; then
+  echo "FAIL: Bottom buffer is $BOTTOM_BUFFER, expected *agent-shell-e2e-mock*." >&2
+  exit 1
+fi
+
+echo "OK: Bottom window is the mock agent shell."
+echo "==> E2E test passed."

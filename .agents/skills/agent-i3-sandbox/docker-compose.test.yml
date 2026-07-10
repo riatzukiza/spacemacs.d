@@ -1,0 +1,26 @@
+services:
+  dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        SPACEMACS_REF: develop
+    image: agent-i3-dev
+    container_name: agent-i3-dev
+    environment:
+      DISPLAY: ":99"
+      XDG_RUNTIME_DIR: "/tmp/runtime-agent"
+      EMACS_DAEMON_NAME: "agent-dev"
+      SPACEMACSDIR: "/home/agent/.spacemacs.d"
+      TERM: "xterm-256color"
+    volumes:
+      - ./:/workspace
+      - ./scripts:/home/agent/bin
+      - /home/err/.sandbox-elpa/30.1/develop:/home/agent/.emacs.d/elpa/30.1/develop
+      - /home/err/.config/i3:/home/agent/.config/i3:ro
+      - /home/err/.config/i3/config:/home/agent/.config/i3/config:ro
+      - /home/err/.spacemacs.d:/home/agent/.spacemacs.d:ro
+      - /home/err/bin/helm-spotlight:/home/agent/bin/helm-spotlight:ro
+    working_dir: /workspace
+    tty: true
+    stdin_open: true

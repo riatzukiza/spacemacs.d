@@ -6,11 +6,15 @@
 
 ;;; Code:
 
+(require 'helm)
+(require 'helm-projectile)
+
 (defconst err/helm-popup-frame-name "helm-popup"
   "Name used for the Helm popup frame.")
 
 (defconst err/helm-popup-frame-params
   `((name . ,err/helm-popup-frame-name)
+    (display . ,(or (getenv "DISPLAY") ":0"))
     (minibuffer . t)
     (width . 110)
     (height . 18)

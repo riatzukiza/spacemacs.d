@@ -1,6 +1,13 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  // "skills": {
-  //   "paths": [".agents/skills"]
-  // }
+  "permission":{
+    "external_directory": {
+      "~/.config/i3/**": "allow",
+      "/tmp/**": "allow",
+      "~/bin/**": "allow",
+      "~/.local/bin/**": "allow",
+      "~/.config/opencode/**": "allow",
+      "/mnt/stealth/**": "allow"
+    }
+  }
 }
