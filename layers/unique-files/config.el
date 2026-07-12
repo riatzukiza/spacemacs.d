@@ -21,14 +21,14 @@ Relative paths are resolved against the current project root."
   :group 'unique-files)
 
 (defcustom unique-files-mode-targets
-  '((markdown-mode     :dir "docs/notes" :ext ".md")
-    (gfm-mode          :dir "docs/notes" :ext ".md")
-    (org-mode          :dir "docs/org"   :ext ".org")
-    (text-mode         :dir "docs/text"  :ext ".txt")
-    (js-mode           :dir "docs/dev"   :ext ".js")
-    (js-ts-mode        :dir "docs/dev"   :ext ".js")
-    (typescript-mode   :dir "docs/dev"   :ext ".ts")
-    (typescript-ts-mode :dir "docs/dev"  :ext ".ts"))
+  '((markdown-mode     :dir "docs/inbox" :ext ".md")
+    (gfm-mode          :dir "docs/inbox" :ext ".md")
+    (org-mode          :dir "docs/inbox"   :ext ".org")
+    (text-mode         :dir "docs/inbox"  :ext ".txt")
+    (js-mode           :dir "pseudo/"   :ext ".js")
+    (js-ts-mode        :dir "pseudo/"   :ext ".js")
+    (typescript-mode   :dir "pseudo/"   :ext ".ts")
+    (typescript-ts-mode :dir "pseudo/"  :ext ".ts"))
   "Alist mapping major modes to plists with :dir and :ext keys.
 Note that only modes listed here can be selected via `unique-files/open-for-mode'."
   :type '(alist :key-type symbol

@@ -99,8 +99,10 @@ This function is called at the very end of Spacemacs initialization."
          vterm vundo web-beautify web-completion-data web-mode wgrep winum
          with-editor writeroom-mode ws-butler yaml yaml-mode yasnippet
          yasnippet-snippets))
-   '(package-vc-selected-packages
-     '())
+   '(package-vc-selected-packages 'nil)
+   '(safe-local-variable-directories
+     '("/home/err/devel/orgs/open-hax/openplanner/packages/agents/knoxx/backend/"
+       "/home/err/devel/orgs/open-hax/eta-mu/packages/sol/"))
    '(safe-local-variable-values
      '((unique-files-mode-targets (markdown-mode :dir "docs/inbox" :ext ".md")
                                   (org-mode :dir "docs/inbox" :ext ".org")
@@ -109,10 +111,9 @@ This function is called at the very end of Spacemacs initialization."
                                   (typescript-ts-mode :dir "pseudo/inbox" :ext
                                                       ".ts"))
        (unique-files-default-dir . "docs/unique")
-       (unique-files-doc-format . "%Y.%m.%d.%H.%M.%S")
-       (typescript-backend . tide) (typescript-backend . lsp)
-       (javascript-backend . tide) (javascript-backend . tern)
-       (javascript-backend . lsp))))
+       (unique-files-doc-format . "%Y.%m.%d.%H.%M.%S") (typescript-backend . tide)
+       (typescript-backend . lsp) (javascript-backend . tide)
+       (javascript-backend . tern) (javascript-backend . lsp))))
   (custom-set-faces
    ;; custom-set-faces was added by Custom.
    ;; If you edit it by hand, you could mess it up, so be careful.
