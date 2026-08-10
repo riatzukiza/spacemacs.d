@@ -32,7 +32,8 @@ configuration."
   (load (expand-file-name "config/frame-title.el" dotspacemacs-directory))
   (load (expand-file-name "config/helm-popup.el" dotspacemacs-directory))
   (load (expand-file-name "config/rofi-bridge.el" dotspacemacs-directory))
-  (load (expand-file-name "config/consult-launcher.el" dotspacemacs-directory)))
+  (load (expand-file-name "config/consult-launcher.el" dotspacemacs-directory))
+  (load (expand-file-name "config/agent-shell.el" dotspacemacs-directory)))
 
 
 ;; Do not write anything past this comment. This is where Emacs will

@@ -1,7 +1,7 @@
 ---
 uuid: "agent-i3-sandbox-dev"
 title: "Add dev target mounting local Spacemacs layers"
-status: "completed"
+status: "review"
 priority: "P2"
 labels: ["infrastructure", "docker", "spacemacs", "dev-loop"]
 created_at: "2026-06-13T02:33:00Z"

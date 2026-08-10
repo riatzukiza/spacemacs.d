@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# Test that the agent-shell project bindings are present and distinct.
+set -euo pipefail
+
+SOCKET="${EMACS_DAEMON_NAME:-agent-dev}"
+
+# 1. i3 configuration contains both bindings (expand includes manually).
+echo "==> Checking i3 config for agent-shell project binding..."
+CONFIG_DIR="$(dirname "$(realpath /home/agent/.config/i3/config)")"
+expand_includes() {
+  local file="$1"
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    if [[ "$line" =~ ^include[[:space:]]+\"(.+)\"$ ]]; then
+      local pattern="${BASH_REMATCH[1]}"
+      # Resolve relative to config dir.
+      if [[ "$pattern" != /* ]]; then
+        pattern="$CONFIG_DIR/$pattern"
+      fi
+      for included in $pattern; do
+        if [[ -f "$included" ]]; then
+          expand_includes "$included"
+        fi
+      done
+    else
+      printf '%s\n' "$line"
+    fi
+  done < "$file"
+}
+expand_includes /home/agent/.config/i3/config > /tmp/i3-full-config.txt
+
+if ! grep -qE 'bindsym.*\$mod\+Ctrl\+Shift\+p.*helm-spotlight.*err/helm-popup-switch-project-to-agent-shell' /tmp/i3-full-config.txt; then
+  echo "FAIL: agent-shell project binding not found in merged i3 config." >&2
+  exit 1
+fi
+if ! grep -qE 'bindsym.*\$mod\+Ctrl\+p[[:space:]].*helm-spotlight[[:space:]]+err/helm-popup-switch-project([[:space:]]|$)' /tmp/i3-full-config.txt; then
+  echo "FAIL: stock project switch binding not found." >&2
+  exit 1
+fi
+# Ensure they resolve to different commands.
+agent_cmd=$(grep -E 'bindsym.*\$mod\+Ctrl\+Shift\+p.*helm-spotlight' /tmp/i3-full-config.txt | sed 's/.*helm-spotlight[[:space:]]\+//')
+stock_cmd=$(grep -E 'bindsym.*\$mod\+Ctrl\+p[[:space:]].*helm-spotlight' /tmp/i3-full-config.txt | sed 's/.*helm-spotlight[[:space:]]\+//')
+if [[ "$agent_cmd" == "$stock_cmd" ]]; then
+  echo "FAIL: Mod+Ctrl+Shift+p and Mod+Ctrl+p map to the same command ($agent_cmd)." >&2
+  exit 1
+fi
+echo "OK: Mod+Ctrl+p -> $stock_cmd"
+echo "OK: Mod+Ctrl+Shift+p -> $agent_cmd"
+
+# 2. Emacs functions are defined.
+echo "==> Checking Emacs functions..."
+for fn in err/helm-popup-switch-project-to-agent-shell \
+          err/switch-project-to-agent-shell-here \
+          err/switch-project-to-agent-shell-new-frame \
+          err/agent-shell-project-layout; do
+  if ! emacsclient -s "$SOCKET" -e "(fboundp (quote $fn))" 2>/dev/null | grep -q 't'; then
+    echo "FAIL: $fn is not defined." >&2
+    exit 1
+  fi
+  echo "OK: $fn is bound."
+done
+
+echo "==> All keybinding tests passed."

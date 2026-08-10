@@ -1,7 +1,7 @@
 ---
 uuid: "rofi-emacsclient-bridge"
 title: "Implement rofi -> emacsclient bridge launcher"
-status: "completed"
+status: "review"
 priority: "P1"
 labels: ["ux", "rofi", "emacs", "i3"]
 created_at: "2026-06-13T02:25:00Z"

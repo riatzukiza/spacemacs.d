@@ -1,7 +1,7 @@
 ---
 uuid: "helm-popup-frame-i3"
 title: "Float a dedicated Helm popup frame in i3"
-status: "completed"
+status: "review"
 priority: "P2"
 labels: ["ux", "helm", "i3", "emacs"]
 created_at: "2026-06-13T02:26:00Z"

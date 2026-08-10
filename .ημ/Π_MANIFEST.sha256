@@ -1,0 +1,16 @@
+464e7affcd7c733629320f0f9a4a9d8866cc0791ce8bc721f9e4d17b9c05eac2  .agents/skills/agent-i3-sandbox/docker-compose.test.yml
+8d327a58056851a0b0c44efed5988b34b43ffdaf8c2a13493c1c92f3eb29dcd6  .agents/skills/agent-i3-sandbox/Dockerfile.dev
+e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855  .agents/skills/agent-i3-sandbox/scripts/helm-spotlight
+213fa05299392795baca5f7e6dcd807dbc265708d300b1413af8dd410a89b333  .agents/skills/agent-i3-sandbox/scripts/install-agent-shell.el
+e1b19bfb9fb709b95a889185e59af526218c462d42f9abf925085c9aeb648f93  .agents/skills/agent-i3-sandbox/scripts/test-agent-shell-layout
+db57ec213644c8ff9686d11d1e616a0a11c06a1995410933686718c6c0762173  .agents/skills/agent-i3-sandbox/scripts/test-e2e-agent-shell-project
+755687fbaf9654af53e80b0f0e499dfd63a2d177b1d29366d0e8db6ac90e96a3  .agents/skills/agent-i3-sandbox/scripts/test-i3-keybinding
+6f9def75ac7d8b751c82cb5b03591412b75fa91b98205e682ba03635da39cdcf  config/agent-shell.el
+96807a16751c1a2fde33e9a5c84a089775db50aa3f42756743140bbdd56309ec  config/helm-popup.el
+dac87c3d145acc3da9ba8009fb92f01a9f8e1b0750c58ff247cc9b6575f2be72  core/layers.el
+7070b104c3bde0dc14714b36e96bf612d4e4abf59edd9d0c8f5565de82484ff4  docs/notes/2026.06.15.14.56.54.md
+6a5fb749649bb9a441f9944cbbc43d3eb0b7cd4df2c649d090a3f476766155b5  docs/notes/2026.06.15.22.57.52.md
+2be569d6649e1419393cb13e8d60c6116bfaf393f308cce08c5979b364a0e118  .gitignore
+465f212ec1eb5607ec210ee4323be6e35b72c011b9310cdfe63d90db2f41773d  init.el
+4a0d3653f587a4a8cb4c0617501d2f9b30f600df205da00350f127c0f71f56fd  opencode.jsonc
+f5b78aa176992aa67fb3859344513f50a9d15d91800c8fdf3586876675604e2c  .spacemacs.env
