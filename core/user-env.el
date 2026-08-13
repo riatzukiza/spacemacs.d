@@ -11,6 +11,11 @@
 ;; `~/.spacemacs.d/.spacemacs.env').
 (spacemacs/load-spacemacs-env)
 
+;; Ensure Volta-managed binaries (e.g. copilot-language-server) are on exec-path.
+(let ((volta-bin (expand-file-name "~/.volta/bin")))
+  (when (file-directory-p volta-bin)
+    (add-to-list 'exec-path volta-bin t)))
+
 ;; Pagers must be non-interactive inside Emacs so that LSP / shell / man output
 ;; is captured correctly.
 (setenv "PAGER" "cat")
