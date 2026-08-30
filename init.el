@@ -102,7 +102,10 @@ This function is called at the very end of Spacemacs initialization."
        yasnippet-snippets))
  '(package-vc-selected-packages 'nil)
  '(safe-local-variable-values
-   '((unique-files-mode-targets (markdown-mode :dir "docs/inbox" :ext ".md")
+   '((cider-preferred-build-tool . shadow-cljs) (cider-default-cljs-repl . shadow)
+     (cider-cljs-lein-repl) (cider-repl-display-help-banner)
+     (cider-shadow-cljs-default-options . ":server")
+     (unique-files-mode-targets (markdown-mode :dir "docs/inbox" :ext ".md")
                                 (org-mode :dir "docs/inbox" :ext ".org")
                                 (text-mode :dir "docs/text" :ext ".txt")
                                 (js-mode :dir "pseudo/inbox" :ext ".js")
